@@ -1,0 +1,138 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif; /* Thoda clean text ke liye */
+}
+
+/* Navbar & Searchbar */
+.navbar {
+    display: flex;
+    flex-wrap: wrap; /* Chhoti screen par searchbar ko niche bhej dega */
+    background-color: #F6F7F8;
+    align-items: center;
+    padding: 10px;
+}
+
+.logo {
+    /* height: 5vh; */
+}
+
+.webname1 {
+    margin: 0 5px;
+    color: #064386;
+}
+
+.webname2 {
+    color: #005CB9;
+}
+
+.searchbar {
+    margin: 0 20px;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+    padding: 12px 20px;
+    width: 100%;
+    max-width: 50vw; /* Badi screen par size control */
+    min-width: 200px; /* Chhoti screen par jyada chhota hone se bachaane ke liye */
+    font-size: 16px;
+    outline: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.searchbar:focus {
+    border-color: #007bff;
+    box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+}
+
+/* Tabs System */
+.tabs {
+    width: 100%;
+    display: flex;
+    justify-content: space-around; /* Screen chahe jo ho, gap barabar batega */
+    align-items: center;
+    padding: 10px 0;
+}
+
+.list {
+    color: gray;
+    font-weight: bolder;
+    cursor: pointer;
+}
+
+#home {
+    color: #064386;
+}
+
+#videotab {
+    color: #005CB9;
+}
+
+#shorts {
+    color: #005CD9;
+}
+#code-area{
+    color: #005CE0;
+}
+
+/* Video Layout */
+.video-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Video Card (Naya logic taaki text aur video aapas me na takraye) */
+.video {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    padding: 10px; /* Card ke andar thodi jagah */
+    background-color: #fff;
+}
+
+.vid-title {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    color: #064386;
+}
+
+.vid-frame {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 4px;
+    overflow: hidden; /* Video ko dabbe ke bahar nikalne se rokne ke liye */
+}
+
+.vid-frame iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+@keyframes zoom{
+    0%{
+        font-size: 20px;
+    }
+    50%{
+        font-size: 2px;
+    }
+    100%{
+        font-size: 20px;
+   }
+}
+.introduction{
+    display: flex;
+    color: #064386;
+    font-size: 2px;
+    font-weight: bold;
+    align-items: center;
+    justify-content: center;
+    animation: zoom 3s ease-in-out infinite;
+}    
