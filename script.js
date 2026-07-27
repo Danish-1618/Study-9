@@ -36,3 +36,51 @@ videos.forEach(video => {
     }
 });
 console.log('Found: ' + count + ' videos');
+
+// 1. Search bar aur saari videos ko select karo
+const searchBar = document.getElementById('searchInput');
+const videos = document.querySelectorAll('.video');
+
+// 2. Results count dikhane ke liye ek div banao
+const resultCount = document.createElement('div');
+resultCount.id = 'resultCount';
+resultCount.style.textAlign = 'center';
+resultCount.style.padding = '10px';
+resultCount.style.fontSize = '16px';
+resultCount.style.color = '#064386';
+resultCount.style.fontWeight = 'bold';
+
+// Video gallery ke baad insert karo
+const videoGallery = document.querySelector('.video-gallery');
+videoGallery.parentNode.insertBefore(resultCount, videoGallery);
+
+// 3. Jab bhi search ho, ye function chalega
+searchBar.addEventListener('keyup', function(event) {
+    
+    let searchQuery = event.target.value.toLowerCase();
+    let visibleCount = 0;
+    
+    // 4. Har ek video ko check karo
+    videos.forEach(function(video) {
+        let title = video.getAttribute('data-title').toLowerCase();
+        
+        if (title.includes(searchQuery)) {
+            video.style.display = ""; 
+            visibleCount++;
+        } else {
+            video.style.display = "none";
+        }
+    });
+    
+    // 5. Results display karo
+    if (searchQuery === "") {
+        resultCount.innerHTML = `<p>Total Videos: ${videos.length}</p>`;
+    } else if (visibleCount === 0) {
+        resultCount.innerHTML = `<p style="color: red;">❌ Koi video nahi mila "${searchQuery}" ke liye</p>`;
+    } else {
+        resultCount.innerHTML = `<p>✅ ${visibleCount} video(s) found</p>`;
+    }
+});
+
+// 6. Initially total count dikhao
+resultCount.innerHTML = `<p>Total Videos: ${videos.length}</p>`;
