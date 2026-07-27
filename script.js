@@ -22,3 +22,17 @@ searchBar.addEventListener('keyup', function(event) {
         }
     });
 });
+
+// script.js mein add karo
+const noResultsDiv = document.createElement('div');
+noResultsDiv.textContent = 'Koi video nahi mila!';
+noResultsDiv.style.textAlign = 'center';
+noResultsDiv.style.padding = '20px';
+
+let count = 0;
+videos.forEach(video => {
+    if (video.style.display !== 'none') {
+        count++;
+    }
+});
+console.log('Found: ' + count + ' videos');
