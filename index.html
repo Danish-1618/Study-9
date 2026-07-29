@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Study 9</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css"/>
 </head>
 
 <body>
@@ -18,68 +18,74 @@
     </nav>
 
     <!-- Tabs Navigation Bar -->
-    <nav class="navbar">
-        <div class="tabs">
+    <nav id="tags" class="navbar">
+        <div id="tabs" class="tabs">
             <div class="list" id="home" data-title="hometab">Home</div>
             <div class="list" id="videotab" data-title="videotab">Videos</div>
             <div class="list" id="shorts" data-title="Shorts">Shorts</div>
             <div class="list" id="code-area" data-title="code-area">Code-area</div>
-            <div class="list" id="my-channelLink"><a href="https://www.youtube.com/@Math_1.618" >My Channel</a></div>
         </div>
     </nav>
 
     <hr style="border: 1px solid #005CB9; width: 100%; margin: 0;">
-    <p class="introduction" ><big>Hello i am Mu.Danish</big></p>
-
+    <div class="intro">
+        <p class="introduction" ><big>Hello i am Mu.Danish</big></p>
+    </div>
+    
     <!-- Video Gallery Section -->
     <div class="video-gallery">
-
-        <!-- Fifth video-->
+        
+        <!-- Fifth video (J.A.R.V.I.S) -->
         <div class="video" data-title="J.A.R.V.I.S-OpenAI + Python Powered Destop assistant | coding | Custom AI assistant | python | CodeWithharry | Code with harry">
             <h3 class="vid-title">J.A.R.V.I.S-OpenAI + Python Powered Destop assistant | custom AI assistant</h3>
-            <div class="vid-frame">
-                <iframe src="https://www.youtube.com/embed/s_8b5iq4Rvk?modestbranding=1&rel=0" allowfullscreen></iframe>
+            <div class="vid-frame" onclick="playVideo(this)">
+                <img class="poster-img" src="https://img.youtube.com/vi/s_8b5iq4Rvk/hqdefault.jpg" alt="Poster">
+                <div class="play-btn">▶</div>
+                <iframe class="my-iframe" data-src="https://www.youtube.com/embed/s_8b5iq4Rvk?modestbranding=1&rel=0&autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
         </div>
-
+        
         <!-- Pehla video -->
         <div class="video" data-title="Class 9 Science Chapter 5 | biology chapter 1 | cell part 1 |  cell koshika | chapter 5">
             <h3 class="vid-title">Class 9 Science Biology Chapter 1 | Cell part 2 | chapter 5</h3>
-            <div class="vid-frame">
-                <iframe src="https://www.youtube.com/embed/https:/ZT2o4h6tTyo?modestbranding=1&rel=0" allowfullscreen></iframe>
+            <div class="vid-frame" onclick="playVideo(this)">
+                <img class="poster-img" src="https://img.youtube.com/vi/CQPFCFYTSNE/hqdefault.jpg" alt="Poster">
+                <div class="play-btn">▶</div>
+                <iframe class="my-iframe" data-src="https://www.youtube.com/embed/CQPFCFYTSNE?modestbranding=1&rel=0&autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
         </div>
 
         <!-- Dusra video -->
         <div class="video" data-title="Class 9 Science Chapter 5 | biology chapter 1 | cell part 2 |  cell koshika | chapter 5">
             <h3 class="vid-title">Class 9 Science Biology Chapter 1 | Cell part 1 | chapter 5</h3>
-            <div class="vid-frame">
-                <iframe src="https://www.youtube.com/embed/XebUIVfQC3o?modestbranding=1&rel=0" allowfullscreen></iframe>
+            <div class="vid-frame" onclick="playVideo(this)">
+                <img class="poster-img" src="https://img.youtube.com/vi/XebUIVfQC3o/hqdefault.jpg" alt="Poster">
+                <div class="play-btn">▶</div>
+                <iframe class="my-iframe" data-src="https://www.youtube.com/embed/XebUIVfQC3o?modestbranding=1&rel=0&autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
         </div>
         
         <!-- Teesra video -->
         <div class="video" data-title="Class 9 history Chapter 1 | history chapter 1 | phranshisi kranti oneshot | franshisi kranti | chapter 1">
             <h3 class="vid-title">Class 9 History Chapter 1 | Phranshisi kranti oneshot | chapter 1</h3>
-            <div class="vid-frame">
-                <iframe src="https://www.youtube.com/embed/a2rYUh5KOf0?modestbranding=1&rel=0" allowfullscreen></iframe>
+            <div class="vid-frame" onclick="playVideo(this)">
+                <img class="poster-img" src="https://img.youtube.com/vi/a2rYUh5KOf0/hqdefault.jpg" alt="Poster">
+                <div class="play-btn">▶</div>
+                <iframe class="my-iframe" data-src="https://www.youtube.com/embed/a2rYUh5KOf0?modestbranding=1&rel=0&autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>      
+        
+        <!-- Forth video -->
+        <div class="video" data-title="Codeing with Danish CSS animation | Coding | css code | CSS">
+            <h3 class="vid-title">Coding with Danish | CSS animation</h3>
+            <div class="vid-frame" onclick="playVideo(this)">
+                <img class="poster-img" src="https://img.youtube.com/vi/ZT2o4h6tTyo/hqdefault.jpg" alt="Poster">
+                <div class="play-btn">▶</div>
+                <iframe class="my-iframe" data-src="https://www.youtube.com/embed/ZT2o4h6tTyo?modestbranding=1&rel=0&autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
         </div>
 
-        <!-- Forth video-->
-        <div class="video" data-title="Codeing with Danish CSS animation | Coding | css code | CSS">
-            <h3 class="vid-title">Coding with Danish | CSS animation</h3>
-            <div class="vid-frame">
-                <iframe src="https://www.youtube.com/embed/ZT2o4h6tTyo?modestbranding=1&rel=0" allowfullscreen></iframe>
-            </div>
-        </div> 
-       
-
     </div>
-<!-- index.html mein add karo -->
-<footer>
-    <p>&copy; 2026 Study-9 | <a href="privacy.html">Privacy Policy</a></p>
-</footer>
 
     <script src="script.js"></script>
 </body>
