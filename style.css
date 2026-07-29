@@ -148,10 +148,10 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 40px;
-    color: white;
-    background-color: rgba(255, 0, 0, 0.8);
+    color: #005CB9;
+    background-color: #ccc;
     padding: 10px 25px;
-    border-radius: 10px;
+    border-radius: 50px;
     z-index: 3;
 }
 
