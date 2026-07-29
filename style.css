@@ -157,6 +157,7 @@ body {
 
 /* Hover karne par play button ka colour thoda change ho */
 .vid-frame:hover .play-btn {
+    color: #005CB9;
     background-color: transparent;
 }
 
