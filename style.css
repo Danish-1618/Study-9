@@ -157,7 +157,7 @@ body {
 
 /* Hover karne par play button ka colour thoda change ho */
 .vid-frame:hover .play-btn {
-    background-color: red;
+    background-color: transparent;
 }
 
 /* Video chalne ke baad poster hide karne ka logic */
