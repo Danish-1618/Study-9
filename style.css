@@ -5,20 +5,16 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: sans-serif; /* Thoda clean text ke liye */
+    font-family: sans-serif;
 }
 
 /* Navbar & Searchbar */
 .navbar {
     display: flex;
-    flex-wrap: wrap; /* Chhoti screen par searchbar ko niche bhej dega */
+    flex-wrap: wrap;
     background-color: #F6F7F8;
     align-items: center;
     padding: 10px;
-}
-
-.logo {
-    /* height: 5vh; */
 }
 
 .webname1 {
@@ -36,8 +32,8 @@ body {
     border: 1px solid #ccc;
     padding: 12px 20px;
     width: 100%;
-    max-width: 50vw; /* Badi screen par size control */
-    min-width: 200px; /* Chhoti screen par jyada chhota hone se bachaane ke liye */
+    max-width: 50vw;
+    min-width: 200px;
     font-size: 16px;
     outline: none;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -53,7 +49,7 @@ body {
 .tabs {
     width: 100%;
     display: flex;
-    justify-content: space-around; /* Screen chahe jo ho, gap barabar batega */
+    justify-content: space-around;
     align-items: center;
     padding: 10px 0;
 }
@@ -64,20 +60,10 @@ body {
     cursor: pointer;
 }
 
-#home {
-    color: #064386;
-}
-
-#videotab {
-    color: #005CB9;
-}
-
-#shorts {
-    color: #005CD9;
-}
-#code-area{
-    color: #005CE0;
-}
+#home { color: #064386; }
+#videotab { color: #005CB9; }
+#shorts { color: #005CD9; }
+#code-area { color: #005CE0; }
 
 /* Video Layout */
 .video-gallery {
@@ -88,13 +74,12 @@ body {
     padding: 20px;
 }
 
-/* Video Card (Naya logic taaki text aur video aapas me na takraye) */
 .video {
     width: 100%;
     max-width: 400px;
     border-radius: 4px;
     border: 1px solid #ccc;
-    padding: 10px; /* Card ke andar thodi jagah */
+    padding: 10px;
     background-color: #fff;
 }
 
@@ -108,7 +93,9 @@ body {
     width: 100%;
     aspect-ratio: 16 / 9;
     border-radius: 4px;
-    overflow: hidden; /* Video ko dabbe ke bahar nikalne se rokne ke liye */
+    overflow: hidden;
+    position: relative; /* Naya add kiya poster ke liye */
+    cursor: pointer; /* Naya add kiya poster ke liye */
 }
 
 .vid-frame iframe {
@@ -116,17 +103,13 @@ body {
     height: 100%;
     border: none;
 }
+
 @keyframes zoom{
-    0%{
-        font-size: 20px;
-    }
-    50%{
-        font-size: 2px;
-    }
-    100%{
-        font-size: 20px;
-   }
+    0% { font-size: 20px; }
+    50% { font-size: 2px; }
+    100% { font-size: 20px; }
 }
+
 .introduction{
     display: flex;
     color: #064386;
@@ -135,10 +118,50 @@ body {
     align-items: center;
     justify-content: center;
     animation: zoom 3s ease-in-out infinite;
-} 
+}
+
 .video video{
     width: 100%;
     height: 100%;
     object-fit: contain;
     display: block;
-}   
+}
+
+/* ========================================= */
+/* POSTER AUR PLAY BUTTON KA NAYA CSS YAHAN HAI */
+/* ========================================= */
+
+.poster-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 2;
+    transition: opacity 0.3s ease;
+}
+
+.play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 40px;
+    color: white;
+    background-color: rgba(255, 0, 0, 0.8);
+    padding: 10px 25px;
+    border-radius: 10px;
+    z-index: 3;
+}
+
+/* Hover karne par play button ka colour thoda change ho */
+.vid-frame:hover .play-btn {
+    background-color: red;
+}
+
+/* Video chalne ke baad poster hide karne ka logic */
+.hide-poster .poster-img,
+.hide-poster .play-btn {
+    display: none;
+}
