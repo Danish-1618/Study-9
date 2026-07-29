@@ -1,4 +1,4 @@
-// 1. Elements select karo (Strictly Sirf EK BAAR declare karna hai!)
+// 1. Elements select karo
 const searchBar = document.getElementById('searchInput');
 const videos = document.querySelectorAll('.video');
 const videoGallery = document.querySelector('.video-gallery');
@@ -20,35 +20,40 @@ resultCount.innerHTML = `📚 Total Videos: ${videos.length}`;
 
 // 3. Search Engine Logic (Event Listener)
 searchBar.addEventListener('keyup', function(event) {
-    
-    // User input ko lower case me badlo (taaki case-sensitive na rahe)
     let searchQuery = event.target.value.toLowerCase();
-    
-    // Naya variable: Dikhne wale videos count karne ke liye
     let visibleCount = 0; 
     
-    // 4. Har ek video ko loop karke check karo
     videos.forEach(function(video) {
         let title = video.getAttribute('data-title').toLowerCase();
         
-        // Agar title me search query hai, toh dikhao aur count badhao
         if (title.includes(searchQuery)) {
             video.style.display = ""; 
-            visibleCount++; // Increment operator (visibleCount = visibleCount + 1)
+            visibleCount++; 
         } else {
-            video.style.display = "none"; // Match nahi kiya toh chhupa do
+            video.style.display = "none"; 
         }
     });
     
-    // 5. Results Display Logic (Conditions)
     if (searchQuery === "") {
-        // Agar search bar khali hai
         resultCount.innerHTML = `📚 Total Videos: ${videos.length}`;
     } else if (visibleCount === 0) {
-        // Agar count 0 hai (Empty Set)
-        resultCount.innerHTML = `<span style="color: red;">❌ No - result found "${searchQuery}" ke liye</span>`;
+        resultCount.innerHTML = `<span style="color: red;">❌ Koi video nahi mila "${searchQuery}" ke liye</span>`;
     } else {
-        // Agar videos mil gaye
         resultCount.innerHTML = `<span style="color: green;">✅ ${visibleCount} video(s) found for "${searchQuery}"</span>`;
     }
 });
+
+// ========================================= 
+// VIDEO PLAY FUNCTION (AUTO-PLAY FIXED)
+// ========================================= 
+function playVideo(frameDiv) {
+    let iframe = frameDiv.querySelector('.my-iframe');
+    
+    if (iframe && !iframe.getAttribute('src')) {
+        let videoUrl = iframe.getAttribute('data-src');
+        iframe.setAttribute('src', videoUrl);
+    }
+    
+    // Poster aur play button ko hide kar dega taaki video dikhe
+    frameDiv.classList.add('hide-poster');
+}
