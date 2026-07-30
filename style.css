@@ -134,7 +134,7 @@ body {
     display: block;
 }
 /* PDF Card Styling */
-.pdf-card {
+.pdf-card img {
     position: relative;
     width: 100%;
     border-radius: 8px;
