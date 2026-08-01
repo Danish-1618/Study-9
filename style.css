@@ -81,6 +81,7 @@ body {
     border: 1px solid #ccc;
     padding: 10px;
     background-color: #fff;
+    aspect-ratio: 16 / 9;
 }
 
 .vid-title {
