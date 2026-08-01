@@ -81,7 +81,6 @@ body {
     border: 1px solid #ccc;
     padding: 10px;
     background-color: #fff;
-    aspect-ratio: 16 / 9;
 }
 
 .vid-title {
@@ -142,6 +141,14 @@ body {
     overflow: hidden;
     background-color: #000;
     cursor: pointer;
+}
+.pdf {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #fff;
 }
 
 /*.pdf-link {
