@@ -211,7 +211,7 @@ body {
     transform: translate(-50%, -50%);
     font-size: 40px;
     color: #005CB9;
-    background-color: transparent;
+    background-color: none;
     padding: 10px 25px;
     border-radius: 50px;
     z-index: 3;
