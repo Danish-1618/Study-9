@@ -17,12 +17,13 @@ body {
     padding: 10px;
 }
 
-.webname1 {
+.logo-title {
     margin: 0 5px;
     color: #064386;
 }
 
-.webname2 {
+.highlight {
+    margin: 0 5px;
     color: #005CB9;
 }
 
@@ -210,7 +211,7 @@ body {
     transform: translate(-50%, -50%);
     font-size: 40px;
     color: #005CB9;
-    background-color: #ccc;
+    background-color: transparent;
     padding: 10px 25px;
     border-radius: 50px;
     z-index: 3;
