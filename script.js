@@ -1,3 +1,10 @@
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(() => console.log("Service Worker Registered Successfully"))
+    .catch((err) => console.log("SW Registration Failed:", err));
+}
+
 // 1. Elements select karo
 const searchBar = document.getElementById('searchInput');
 const videos = document.querySelectorAll('.video');
