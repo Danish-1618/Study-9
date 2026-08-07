@@ -1,9 +1,15 @@
-// PWA Service Worker Registration
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js')
-    .then(() => console.log("Service Worker Registered Successfully"))
-    .catch((err) => console.log("SW Registration Failed:", err));
-}
+self.addEventListener('install', (e) => {
+  console.log('[Service Worker] Installed');
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (e) => {
+  console.log('[Service Worker] Activated');
+});
+
+self.addEventListener('fetch', (e) => {
+  e.respondWith(fetch(e.request));
+});
 
 // 1. Elements select karo
 const searchBar = document.getElementById('searchInput');
