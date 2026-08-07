@@ -1,8 +1,11 @@
+// script.js ke sabse upar ye daalo
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js')
-    .then(() => console.log("Service Worker Registered"))
-    .catch((err) => console.log("SW Registration Failed:", err));
+    navigator.serviceWorker.register('./sw.js')
+    .then((reg) => console.log("Service Worker Registered!", reg))
+    .catch((err) => console.log("SW Failed:", err));
 }
+
+// ... baaki tumhara search logic yahan niche rahega ...
 
 // 1. Elements select karo
 const searchBar = document.getElementById('searchInput');
