@@ -15,8 +15,8 @@
       "purpose": "any maskable"
     }
   ],
-  "start_url": "/Study-9/",
-  "scope": "/Study-9/",
+  "start_url": "./",
+  "scope": "./",
   "background_color": "#ffffff",
   "theme_color": "#000000",
   "display": "standalone"
