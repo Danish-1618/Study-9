@@ -10,6 +10,11 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   e.respondWith(fetch(e.request));
 });
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js', { scope: '/Study-9/' })
+    .then(() => console.log("Service Worker Registered Successfully"))
+    .catch((err) => console.log("SW Registration Failed:", err));
+}
 
 // 1. Elements select karo
 const searchBar = document.getElementById('searchInput');
