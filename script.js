@@ -1,8 +1,7 @@
-// script.js ke sabse upar ye daalo
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js')
+  navigator.serviceWorker.register('sw.js')
     .then((reg) => console.log("Service Worker Registered!", reg))
-    .catch((err) => console.log("SW Failed:", err));
+    .catch((err) => console.log("SW Registration Failed:", err));
 }
 
 // ... baaki tumhara search logic yahan niche rahega ...
