@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://danish-1618.github.io/Study-9/sitemap.xml
