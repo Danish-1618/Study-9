@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Input Tag Ultimate Masterclass</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 20px;
+            max-width: 900px;
+            margin: auto;
+        }
+        img{
+            display: flex;
+            max-width: 100vw;
+            align-items: center;
+            justify-content: center;
+        }
+        fieldset {
+            border: 2px solid #38bdf8;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: #1e293b;
+        }
+        legend {
+            color: #38bdf8;
+            font-weight: bold;
+            font-size: 1.1rem;
+            padding: 0 10px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+        input, select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #475569;
+            background-color: #0f172a;
+            color: #fff;
+            font-size: 1rem;
+        }
+        input:focus {
+            outline: 2px solid #38bdf8;
+        }
+        button {
+            background-color: #38bdf8;
+            color: #0f172a;
+            border: none;
+            padding: 12px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+        }
+        button:hover {
+            background-color: #0ea5e9;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 style="text-align: center; color: #38bdf8;">HTML Input Tag: Complete Reference Guide</h1>
+    <p style="text-align: center; color: #94a3b8;">यह पूरा कोड सारे इनपुट टाइप्स और उनके सीक्रेट एट्रीब्यूट्स के साथ हिंदी कमेंट्स के रूप में तैयार किया गया है।</p>
+
+    <!-- फॉर्म की शुरुआत: बिना <form> के इनपुट का वैलिडेशन और सबमिशन काम नहीं करता -->
+    <form action="#" method="POST">
+
+        <!-- ================= 1. बेसिक टेक्स्ट और नंबर टाइप्स ================= -->
+        <fieldset>
+            <legend>1. बेसिक टेक्स्ट, नंबर और पहचान वाले इनपुट</legend>
+
+            <!-- साधारण टेक्स्ट इनपुट: नाम या कोई भी सामान्य जानकारी लेने के लिए -->
+            <div class="input-group">
+                <label>साधारण टेक्स्ट (Text Input):</label>
+                <input type="text" placeholder="अपना नाम लिखें" required>
+            </div>
+
+            <!-- ईमेल इनपुट: इसमें @ और .com का होना ब्राउज़र द्वारा चेक किया जाता है -->
+            <div class="input-group">
+                <label>ईमेल (Email Input):</label>
+                <input type="email" placeholder="example@gmail.com" required>
+            </div>
+
+            <!-- पासवर्ड इनपुट: इसमें लिखे गए अक्षर छिप जाते हैं (डॉट्स बन जाते हैं) -->
+            <div class="input-group">
+                <label>पासवर्ड (Password Input):</label>
+                <input type="password" placeholder="सुरक्षित पासवर्ड दर्ज करें">
+            </div>
+
+            <!-- नंबर इनपुट: इसमें सिर्फ अंक लिखे जा सकते हैं, साथ में min और max लिमिट दी जा सकती है -->
+            <div class="input-group">
+                <label>नंबर (Number Input):</label>
+                <input type="number" min="1" max="100" step="1" placeholder="आयु (1 से 100)">
+            </div>
+
+            <!-- टेलीफोन इनपुट: मोबाइल में यह विशेष रूप से नंबर वाला कीपैड खोलता है -->
+            <div class="input-group">
+                <label>फोन नंबर (Telephone Input):</label>
+                <input type="tel" placeholder="10 अंकों का मोबाइल नंबर">
+            </div>
+
+            <!-- यूआरएल इनपुट: वेबसाइट का लिंक सही फॉर्मेट (http/https) में है या नहीं, यह जांचता है -->
+            <div class="input-group">
+                <label>वेबसाइट लिंक (URL Input):</label>
+                <input type="url" placeholder="https://example.com">
+            </div>
+        </fieldset>
+
+
+        <!-- ================= 2. खोज और डेटा सिलेक्शन ================= -->
+        <fieldset>
+            <legend>2. सर्च और ऑटो-सजेशन (Datalist)</legend>
+
+            <!-- सर्च इनपुट: इसमें टाइप करते ही साइड में 'X' (क्लियर) बटन आ जाता है -->
+            <div class="input-group">
+                <label>सर्च बॉक्स (Search Input):</label>
+                <input type="search" placeholder="यहाँ खोजें...">
+            </div>
+
+            <!-- ऑटो-सजेशन लिस्ट: list एट्रिब्यूट के जरिए बिना जावास्क्रिप्ट के गूगल जैसी ड्रॉप-डाउन लिस्ट बनाना -->
+            <div class="input-group">
+                <label>ऑटो-सजेशन लिस्ट (Datalist):</label>
+                <input list="languages" placeholder="प्रोग्रामिंग भाषा चुनें">
+                <datalist id="languages">
+                    <option value="Python">
+                    <option value="JavaScript">
+                    <option value="HTML/CSS">
+                    <option value="C++">
+                </datalist>
+            </div>
+        </fieldset>
+
+
+        <!-- ================= 3. तारीख और समय (Date & Time) ================= -->
+        <fieldset>
+            <legend>3. तारीख, समय और रेंज वाले इनपुट</legend>
+
+            <!-- तारीख चुनने के लिए कैलेंडर पिकर -->
+            <div class="input-group">
+                <label>तारीख (Date Input):</label>
+                <input type="date">
+            </div>
+
+            <!-- समय (घंटे और मिनट) चुनने के लिए -->
+            <div class="input-group">
+                <label>समय (Time Input):</label>
+                <input type="time">
+            </div>
+
+            <!-- हफ्ता चुनने के लिए -->
+            <div class="input-group">
+                <label>हफ्ता (Week Input):</label>
+                <input type="week">
+            </div>
+
+            <!-- महीना और साल चुनने के लिए -->
+            <div class="input-group">
+                <label>महीना (Month Input):</label>
+                <input type="month">
+            </div>
+
+            <!-- स्लाइडर (रेंज): कम या ज्यादा करने के लिए बार -->
+            <div class="input-group">
+                <label>रेंज स्लाइडर (Range Input):</label>
+                <input type="range" min="0" max="100" value="50">
+            </div>
+        </fieldset>
+
+
+        <!-- ================= 4. मल्टीमीडिया, फाइल और रंग ================= -->
+        <fieldset>
+            <legend>4. फाइल अपलोड, कैमरा, माइक और रंग</legend>
+
+            <!-- रंग चुनने के लिए कलर पिकर (हेक्स कोड देता है जैसे #ff0000) -->
+            <div class="input-group">
+                <label>रंग चयन (Color Picker):</label>
+                <input type="color" value="#38bdf8">
+            </div>
+
+            <!-- फाइल अपलोड: multiple लगाने से एक साथ कई फाइलें चुनी जा सकती हैं -->
+            <div class="input-group">
+                <label>फाइल अपलोड (File Input with Multiple):</label>
+                <input type="file" multiple accept=".pdf, image/*">
+            </div>
+
+            <!-- डायरेक्ट कैमरा खोलकर फोटो खींचने के लिए (capture एट्रिब्यूट का जादू) -->
+            <div class="input-group">
+                <label>डायरेक्ट कैमरा फोटो (Capture Environment):</label>
+                <input type="file" accept="image/*" capture="environment">
+            </div>
+
+            <!-- सीधा माइक या ऑडियो रिकॉर्डर खोलने के लिए -->
+            <div class="input-group">
+                <label>ऑडियो/माइक कैप्चर (Capture Microphone):</label>
+                <input type="file" accept="audio/*" capture="microphone">
+            </div>
+        </fieldset>
+
+
+        <!-- ================= 5. चॉइस (Checkbox & Radio) ================= -->
+        <fieldset>
+            <legend>5. चेकबॉक्स और रेडियो बटन</legend>
+
+            <!-- चेकबॉक्स: कई विकल्पों में से एक से ज्यादा चुनने की छूट -->
+            <div style="margin-bottom: 10px;">
+                <label style="display: inline-block; margin-right: 15px;">
+                    <input type="checkbox" name="hobbies" value="coding" checked> कोडिंग (डिफ़ॉल्ट टिक)
+                </label>
+                <label style="display: inline-block;">
+                    <input type="checkbox" name="hobbies" value="reading"> पढ़ना
+                </label>
+            </div>
+
+            <!-- रेडियो बटन: कई विकल्पों में से सिर्फ एक ही चुनना हो (सब्जेक्ट या जेंडर) -->
+            <div>
+                <label style="margin-right: 15px;">
+                    <input type="radio" name="gender" value="male"> मेल
+                </label>
+                <label>
+                    <input type="radio" name="gender" value="female"> फीमेल
+                </label>
+            </div>
+        </fieldset>
+
+
+        <!-- ================= 6. छुपे हुए और कंट्रोल बटन्स ================= -->
+        <fieldset>
+            <legend>6. हिडन इनपुट और सबमिट/रीसेट बटन्स</legend>
+
+            <!-- हिडन इनपुट: यह स्क्रीन पर नहीं दिखता, लेकिन सर्वर पर चुपचाप डेटा (जैसे ID या Token) भेजता है -->
+            <input type="hidden" name="secret_user_id" value="987654">
+
+            <!-- सबमिट बटन: फॉर्म को भेजने के लिए -->
+            <div style="margin-bottom: 10px;">
+                <input type="submit" value="डेटा सबमिट करें (Submit)">
+            </div>
+
+            <!-- रिसेट बटन: फॉर्म के अंदर भरा हुआ सारा डेटा एक क्लिक में साफ़ करने के लिए -->
+            <div style="margin-bottom: 10px;">
+                <input type="reset" value="फॉर्म साफ़ करें (Reset)">
+            </div>
+
+            <!-- इमेज सबमिट बटन: किसी तस्वीर को सबमिट बटन बनाने के लिए -->
+            <!-- <input type="image" src="submit-icon.png" alt="Submit Button" width="100"> -->
+        </fieldset>
+
+    </form>
+    <img src="form-1.jpg" alt="" />
+    <img src="form-2.jpg" alt="" />
+    <img src="form-3.jpg" alt="" />
+</body>
+</html>
