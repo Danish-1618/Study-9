@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neux AI</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #121212; 
+            color: #ffffff; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            box-sizing: border-box; 
+        }
+        h1 { 
+            text-align: center; 
+            color: #00adb5; 
+            margin-bottom: 10px; 
+            letter-spacing: 2px;
+        }
+        .config-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            max-width: 500px;
+        }
+        #api-key-input { 
+            flex-grow: 1;
+            padding: 10px; 
+            border-radius: 5px; 
+            border: 1px solid #333; 
+            background-color: #1e1e1e;
+            color: white;
+            outline: none;
+        }
+        #model-select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            background-color: #1e1e1e;
+            color: white;
+            outline: none;
+            width: 100%;
+            max-width: 500px;
+        }
+        #load-models-btn {
+            padding: 10px 15px;
+            background-color: #393e46;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #load-models-btn:hover {
+            background-color: #00adb5;
+            color: #121212;
+        }
+        #chat-box { 
+            flex-grow: 1; 
+            overflow-y: auto; 
+            background-color: #1e1e1e; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-bottom: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            border: 1px solid #333;
+        }
+        .message { 
+            padding: 12px 18px; 
+            border-radius: 8px; 
+            max-width: 75%; 
+            line-height: 1.5;
+            word-wrap: break-word; 
+        }
+        .user-msg { 
+            background-color: #00adb5; 
+            color: #121212;
+            align-self: flex-end; 
+            font-weight: 500;
+        }
+        .ai-msg { 
+            background-color: #2d2d2d; 
+            align-self: flex-start; 
+        }
+        .input-container { 
+            display: flex; 
+            gap: 10px; 
+        }
+        #prompt-input { 
+            flex-grow: 1; 
+            padding: 15px; 
+            border: none; 
+            border-radius: 8px; 
+            background-color: #1e1e1e; 
+            color: white; 
+            font-size: 16px; 
+            border: 1px solid #333;
+            outline: none;
+        }
+        #prompt-input:focus {
+            border-color: #00adb5;
+        }
+        button.send-btn { 
+            padding: 15px 25px; 
+            border: none; 
+            border-radius: 8px; 
+            background-color: #00adb5; 
+            color: #121212; 
+            font-size: 16px; 
+            font-weight: bold;
+            cursor: pointer; 
+            transition: background-color 0.3s;
+        }
+        button.send-btn:hover { 
+            background-color: #007c82; 
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Neux AI</h1>
+    
+    <div class="config-container">
+        <div class="input-row">
+            <input type="password" id="api-key-input" placeholder="Enter your Gemini API Key here...">
+            <button id="load-models-btn" onclick="loadModels()">Load Models</button>
+        </div>
+        <select id="model-select">
+            <option value="">First, enter API key and click Load Models</option>
+        </select>
+    </div>
+    
+    <div id="chat-box"></div>
+    
+    <div class="input-container">
+        <input type="text" id="prompt-input" placeholder="Ask Neux AI something..." onkeypress="handleKeyPress(event)">
+        <button class="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        let chatHistory = [];
+
+        // यह फंक्शन API Key से अवेलेबल मॉडल्स को फेच करेगा
+        async function loadModels() {
+            const apiKey = document.getElementById('api-key-input').value.trim();
+            const select = document.getElementById('model-select');
+            const btn = document.getElementById('load-models-btn');
+            
+            if (!apiKey) {
+                alert("Bhai, pehle API key daal do!");
+                return;
+            }
+
+            btn.innerText = "Loading...";
+            
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+                const data = await res.json();
+                
+                if (data.error) {
+                    alert("Error loading models: " + data.error.message);
+                    btn.innerText = "Load Models";
+                    return;
+                }
+
+                select.innerHTML = ''; 
+                let count = 0;
+                
+                data.models.forEach(model => {
+                    if(model.supportedGenerationMethods.includes("generateContent")) {
+                        const opt = document.createElement('option');
+                        opt.value = model.name; 
+                        opt.innerText = model.displayName || model.name;
+                        
+                        // अगर लिस्ट में gemini-1.5-flash है, तो उसे बाय डिफ़ॉल्ट सिलेक्ट करो
+                        if (model.name.includes("gemini-1.5-flash")) {
+                            opt.selected = true;
+                        }
+                        
+                        select.appendChild(opt);
+                        count++;
+                    }
+                });
+
+                if (count === 0) {
+                    select.innerHTML = '<option value="">Koi valid model nahi mila</option>';
+                }
+
+                btn.innerText = "Loaded!";
+                setTimeout(() => btn.innerText = "Load Models", 2000);
+
+            } catch (error) {
+                alert("Network error: " + error.message);
+                btn.innerText = "Load Models";
+            }
+        }
+
+        async function sendMessage() {
+            const apiKey = document.getElementById('api-key-input').value.trim();
+            const selectedModel = document.getElementById('model-select').value;
+            const promptInput = document.getElementById('prompt-input');
+            const userText = promptInput.value.trim();
+
+            if (!apiKey) {
+                alert("Please enter your API key!");
+                return;
+            }
+            if (!selectedModel) {
+                alert("Please click 'Load Models' and select a model first!");
+                return;
+            }
+            if (!userText) return;
+
+            appendMessage(userText, 'user-msg');
+            promptInput.value = '';
+
+            chatHistory.push({ role: "user", parts: [{ text: userText }] });
+            const loadingId = appendMessage("Neux AI is typing...", 'ai-msg');
+
+            try {
+                // अब URL में कोई नाम हार्डकोड नहीं है, यह सीधा तुम्हारे सिलेक्ट किये हुए मॉडल को कॉल करेगा
+                const url = `https://generativelanguage.googleapis.com/v1beta/${selectedModel}:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: chatHistory })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    document.getElementById(loadingId).innerText = "Error: " + data.error.message;
+                    chatHistory.pop(); 
+                    return;
+                }
+
+                const aiText = data.candidates[0].content.parts[0].text;
+                document.getElementById(loadingId).innerText = aiText;
+                chatHistory.push({ role: "model", parts: [{ text: aiText }] });
+
+            } catch (error) {
+                document.getElementById(loadingId).innerText = "Kuch error aa gaya: " + error.message;
+                chatHistory.pop();
+            }
+        }
+
+        function appendMessage(text, className) {
+            const chatBox = document.getElementById('chat-box');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${className}`;
+            msgDiv.id = 'msg-' + Date.now();
+            msgDiv.innerText = text;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return msgDiv.id;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+</html>
