@@ -2,271 +2,297 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neux AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Neux AI - God Mode</title>
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #121212; 
-            color: #ffffff; 
-            margin: 0; 
-            padding: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh; 
+            background-color: #121212; color: #ffffff; 
+            margin: 0; padding: 15px; 
+            display: flex; flex-direction: column; 
+            /* Fallback for older browsers, 100dvh for modern mobile keyboard support */
+            height: 100vh; height: 100dvh; 
             box-sizing: border-box; 
         }
-        h1 { 
-            text-align: center; 
-            color: #00adb5; 
-            margin-bottom: 10px; 
-            letter-spacing: 2px;
-        }
-        h3{
-            color: red;
-        }
+        
         p{
             color: #ccc;
             font-size: 15px;
         }
-        .config-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-            align-items: center;
+        .header-container {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px;
         }
-        .input-row {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-            max-width: 500px;
+        h1 { margin: 0; color: #00adb5; font-size: 22px; letter-spacing: 1px; }
+        
+        #toggle-btn {
+            background-color: #393e46; color: white; border: none; padding: 8px 12px;
+            border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.3s;
         }
-        #api-key-input { 
-            flex-grow: 1;
-            padding: 10px; 
-            border-radius: 5px; 
-            border: 1px solid #333; 
-            background-color: #1e1e1e;
-            color: white;
-            outline: none;
+        #toggle-btn:hover { background-color: #00adb5; color: #121212; }
+
+        #settings-panel {
+            background-color: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #333;
+            margin-bottom: 15px;
         }
-        #model-select {
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #333;
-            background-color: #1e1e1e;
-            color: white;
-            outline: none;
-            width: 100%;
-            max-width: 500px;
-        }
-        #load-models-btn {
-            padding: 10px 15px;
-            background-color: #393e46;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        #load-models-btn:hover {
-            background-color: #00adb5;
-            color: #121212;
-        }
+
+        .config-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; align-items: center; width: 100%; }
+        input, select, button.action-btn { padding: 12px; border-radius: 5px; border: 1px solid #333; background-color: #1e1e1e; color: white; outline: none; font-size: 14px; }
+        
+        #api-key-input { flex-grow: 1; min-width: 150px; }
+        #provider-select, #model-select { flex-grow: 1; min-width: 150px; }
+        
+        #custom-url-container { display: none; width: 100%; margin-bottom: 10px; }
+        #custom-url-input { width: 100%; box-sizing: border-box; }
+        
+        button.load-btn { background-color: #393e46; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
+        button.load-btn:hover { background-color: #00adb5; color: #121212; }
+
         #chat-box { 
-            flex-grow: 1; 
-            overflow-y: auto; 
-            background-color: #1e1e1e; 
-            padding: 20px; 
-            border-radius: 10px; 
-            margin-bottom: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-            border: 1px solid #333;
+            flex-grow: 1; overflow-y: auto; background-color: #1e1e1e; padding: 15px; 
+            border-radius: 10px; margin-bottom: 15px; display: flex; flex-direction: column; 
+            gap: 15px; border: 1px solid #333;
         }
-        .message { 
-            padding: 12px 18px; 
-            border-radius: 8px; 
-            max-width: 75%; 
-            line-height: 1.5;
-            word-wrap: break-word; 
-        }
-        .user-msg { 
-            background-color: #00adb5; 
-            color: #121212;
-            align-self: flex-end; 
-            font-weight: 500;
-        }
-        .ai-msg { 
-            background-color: #2d2d2d; 
-            align-self: flex-start; 
-        }
-        .input-container { 
-            display: flex; 
-            gap: 10px; 
-        }
-        #prompt-input { 
-            flex-grow: 1; 
-            padding: 15px; 
-            border: none; 
-            border-radius: 8px; 
-            background-color: #1e1e1e; 
-            color: white; 
-            font-size: 16px; 
-            border: 1px solid #333;
-            outline: none;
-        }
-        #prompt-input:focus {
-            border-color: #00adb5;
-        }
-        button.send-btn { 
-            padding: 15px 25px; 
-            border: none; 
-            border-radius: 8px; 
-            background-color: #00adb5; 
-            color: #121212; 
-            font-size: 16px; 
-            font-weight: bold;
-            cursor: pointer; 
-            transition: background-color 0.3s;
-        }
-        button.send-btn:hover { 
-            background-color: #007c82; 
-            color: white;
-        }
+        
+        .message { padding: 12px 15px; border-radius: 8px; max-width: 85%; line-height: 1.5; word-wrap: break-word; font-size: 15px; }
+        .user-msg { background-color: #00adb5; color: #121212; align-self: flex-end; font-weight: 500; }
+        .ai-msg { background-color: #2d2d2d; align-self: flex-start; border: 1px solid #444; }
+        
+        .ai-msg img { max-width: 100%; border-radius: 8px; margin-top: 10px; }
+        .ai-msg pre { background: #000; padding: 10px; border-radius: 5px; overflow-x: auto; border: 1px solid #333; margin: 10px 0;}
+        .ai-msg code { font-family: monospace; background: #000; padding: 2px 5px; border-radius: 3px; color: #00adb5; }
+        .ai-msg strong { color: #fff; }
+
+        .input-container { display: flex; gap: 10px; }
+        #prompt-input { flex-grow: 1; padding: 12px; font-size: 16px; border: 1px solid #333; border-radius: 5px; }
+        button.send-btn { padding: 12px 20px; background-color: #00adb5; color: #121212; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+        button.send-btn:hover { background-color: #007c82; color: white; }
     </style>
 </head>
 <body>
 
-    <h1>Neux AI</h1>
-    <p>Agar app mere dost hai to aap mujhse API key maang sakte hai ya fir apni API KEY hi daal sakte hai</p>
-    <h3>DON'T SHARE YOUR API KEY</h3>
-    <p>Please Select Gemini 3.6 Flash model if you are using my normal API KEY.</p>
+    <div class="header-container">
+        <h1>Neux AI (God-Mode)</h1>
+        <button id="toggle-btn" onclick="toggleSettings()">⚙️ Settings</button>
+    </div>
     
-    <div class="config-container">
-        <div class="input-row">
-            <input type="password" id="api-key-input" placeholder="Enter your Gemini API Key here...">
-            <button id="load-models-btn" onclick="loadModels()">Load Models</button>
+    <div id="settings-panel">
+        <p>Email me For API KEY or Help</p>
+        <div class="config-container">
+            <select id="provider-select" onchange="handleProviderChange()">
+                <option value="gemini">Gemini API</option>
+                <option value="groq">Groq API</option>
+                <option value="openai">OpenAI API</option>
+                <option value="deepseek">DeepSeek API</option>
+                <option value="xai">xAI (Grok) API</option>
+                <option value="openrouter">OpenRouter (All in one)</option>
+                <option value="custom">Custom (Any AI)</option>
+            </select>
+            <input type="password" id="api-key-input" placeholder="Paste API Key here...">
         </div>
-        <select id="model-select">
-            <option value="">First, enter API key and click Load Models</option>
-        </select>
+
+        <div id="custom-url-container">
+            <input type="text" id="custom-url-input" placeholder="Enter Custom Base URL (e.g. https://api.mistral.ai/v1)">
+        </div>
+        
+        <div class="config-container">
+            <button class="action-btn load-btn" id="load-models-btn" onclick="loadModels()">1. Load Models</button>
+        </div>
+
+        <div class="config-container">
+            <select id="model-select">
+                <option value="">2. Select Model (After Loading)</option>
+            </select>
+        </div>
     </div>
     
     <div id="chat-box"></div>
     
     <div class="input-container">
-        <input type="text" id="prompt-input" placeholder="Ask Neux AI something..." onkeypress="handleKeyPress(event)">
+        <input type="text" id="prompt-input" placeholder="Ask anything..." onkeypress="handleKeyPress(event)">
         <button class="send-btn" onclick="sendMessage()">Send</button>
     </div>
 
     <script>
         let chatHistory = [];
 
-        // यह फंक्शन API Key से अवेलेबल मॉडल्स को फेच करेगा
+        const apiConfig = {
+            groq: { base: 'https://api.groq.com/openai/v1' },
+            openai: { base: 'https://api.openai.com/v1' },
+            deepseek: { base: 'https://api.deepseek.com' },
+            xai: { base: 'https://api.x.ai/v1' },
+            openrouter: { base: 'https://openrouter.ai/api/v1' }
+        };
+
+        // Panel Toggle Logic
+        function toggleSettings() {
+            const panel = document.getElementById('settings-panel');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+
+        function handleProviderChange() {
+            document.getElementById('model-select').innerHTML = '<option value="">Click Load Models again...</option>';
+            const provider = document.getElementById('provider-select').value;
+            const customContainer = document.getElementById('custom-url-container');
+            
+            if (provider === 'custom') {
+                customContainer.style.display = 'block';
+                document.getElementById('model-select').innerHTML = '<option value="default">Custom Model (Type name below if needed)</option>';
+            } else {
+                customContainer.style.display = 'none';
+            }
+        }
+
         async function loadModels() {
             const apiKey = document.getElementById('api-key-input').value.trim();
+            const provider = document.getElementById('provider-select').value;
             const select = document.getElementById('model-select');
             const btn = document.getElementById('load-models-btn');
             
-            if (!apiKey) {
-                alert("Bhai, pehle API key daal do!");
-                return;
-            }
+            if (!apiKey) { alert("Bhai, pehle API key daal do!"); return; }
 
-            btn.innerText = "Loading...";
-            
+            btn.innerText = "Loading Models...";
+            select.innerHTML = ''; 
+
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-                const data = await res.json();
-                
-                if (data.error) {
-                    alert("Error loading models: " + data.error.message);
-                    btn.innerText = "Load Models";
-                    return;
-                }
+                let models = [];
 
-                select.innerHTML = ''; 
-                let count = 0;
-                
-                data.models.forEach(model => {
-                    if(model.supportedGenerationMethods.includes("generateContent")) {
-                        const opt = document.createElement('option');
-                        opt.value = model.name; 
-                        opt.innerText = model.displayName || model.name;
-                        
-                        // अगर लिस्ट में gemini-1.5-flash है, तो उसे बाय डिफ़ॉल्ट सिलेक्ट करो
-                        if (model.name.includes("gemini-1.5-flash")) {
-                            opt.selected = true;
-                        }
-                        
-                        select.appendChild(opt);
-                        count++;
+                if (provider === 'gemini') {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+                    const json = await res.json();
+                    if (json.error) throw new Error(json.error.message);
+                    models = json.models
+                        .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent"))
+                        .map(m => ({ id: m.name, name: m.displayName || m.name }));
+                } 
+                else {
+                    let baseUrl = provider === 'custom' ? document.getElementById('custom-url-input').value.trim() : apiConfig[provider].base;
+                    if (provider === 'custom' && !baseUrl) throw new Error("Custom URL daalna padega!");
+
+                    if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+
+                    const res = await fetch(`${baseUrl}/models`, {
+                        headers: { 'Authorization': `Bearer ${apiKey}` }
+                    });
+                    
+                    if (!res.ok) {
+                        models = [{ id: "default", name: "Manual Entry / Default Model" }];
+                    } else {
+                        const json = await res.json();
+                        if (json.error) throw new Error(json.error.message);
+                        models = json.data.map(m => ({ id: m.id, name: m.id }));
                     }
-                });
-
-                if (count === 0) {
-                    select.innerHTML = '<option value="">Koi valid model nahi mila</option>';
                 }
 
-                btn.innerText = "Loaded!";
-                setTimeout(() => btn.innerText = "Load Models", 2000);
+                if (models.length === 0) {
+                    select.innerHTML = '<option value="">Koi valid model nahi mila</option>';
+                } else {
+                    models.forEach(model => {
+                        let opt = document.createElement('option');
+                        opt.value = model.id;
+                        opt.innerText = model.name;
+                        select.appendChild(opt);
+                    });
+                }
+
+                btn.innerText = "Loaded Successfully!";
+                setTimeout(() => btn.innerText = "1. Load Models", 2000);
 
             } catch (error) {
-                alert("Network error: " + error.message);
-                btn.innerText = "Load Models";
+                alert("Error: " + error.message);
+                btn.innerText = "1. Load Models";
+                select.innerHTML = '<option value="default">Fallback Model (Try sending message)</option>';
             }
+        }
+
+        function parseMarkdown(text) {
+            return text
+                .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" style="max-width:100%; border-radius:8px;">')
+                .replace(/```([\s\S]*?)```/g, '<pre style="background:#000; padding:10px; overflow-x:auto;"><code>$1</code></pre>')
+                .replace(/`([^`]+)`/g, '<code style="background:#000; color:#00adb5; padding:2px 4px;">$1</code>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
         }
 
         async function sendMessage() {
             const apiKey = document.getElementById('api-key-input').value.trim();
-            const selectedModel = document.getElementById('model-select').value;
+            const provider = document.getElementById('provider-select').value;
+            const model = document.getElementById('model-select').value;
             const promptInput = document.getElementById('prompt-input');
             const userText = promptInput.value.trim();
 
-            if (!apiKey) {
-                alert("Please enter your API key!");
-                return;
-            }
-            if (!selectedModel) {
-                alert("Please click 'Load Models' and select a model first!");
-                return;
-            }
+            if (!apiKey) { alert("API key daalo!"); return; }
             if (!userText) return;
+
+            // Auto-hide settings when user starts chatting
+            document.getElementById('settings-panel').style.display = 'none';
 
             appendMessage(userText, 'user-msg');
             promptInput.value = '';
 
-            chatHistory.push({ role: "user", parts: [{ text: userText }] });
-            const loadingId = appendMessage("Neux AI is typing...", 'ai-msg');
+            chatHistory.push({ role: 'user', content: userText });
+            const loadingId = appendMessage("Thinking...", 'ai-msg');
+
+            const systemPrompt = "You are an expert Professor. Explain comprehensively from zero to hero. Use real-world examples, logical reasoning, formatting, and markdown.";
 
             try {
-                // अब URL में कोई नाम हार्डकोड नहीं है, यह सीधा तुम्हारे सिलेक्ट किये हुए मॉडल को कॉल करेगा
-                const url = `https://generativelanguage.googleapis.com/v1beta/${selectedModel}:generateContent?key=${apiKey}`;
-                
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: chatHistory })
-                });
+                let aiText;
 
-                const data = await response.json();
-                
-                if (data.error) {
-                    document.getElementById(loadingId).innerText = "Error: " + data.error.message;
-                    chatHistory.pop(); 
-                    return;
+                if (provider === 'gemini') {
+                    const geminiHistory = chatHistory.map(msg => ({
+                        role: msg.role === 'ai' ? 'model' : 'user',
+                        parts: [{ text: msg.content }]
+                    }));
+                    
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            system_instruction: { parts: [{ text: systemPrompt }] },
+                            contents: geminiHistory
+                        })
+                    });
+                    const data = await response.json();
+                    if (data.error) throw new Error(data.error.message);
+                    aiText = data.candidates[0].content.parts[0].text;
+                } 
+                else {
+                    let baseUrl = provider === 'custom' ? document.getElementById('custom-url-input').value.trim() : apiConfig[provider].base;
+                    if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+
+                    const openaiHistory = chatHistory.map(msg => ({
+                        role: msg.role === 'ai' ? 'assistant' : 'user',
+                        content: msg.content
+                    }));
+                    openaiHistory.unshift({ role: "system", content: systemPrompt });
+
+                    const response = await fetch(`${baseUrl}/chat/completions`, {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${apiKey}`
+                        },
+                        body: JSON.stringify({
+                            model: model === 'default' ? prompt("Enter exact model name (e.g. llama-3-8b):") || 'default' : model,
+                            messages: openaiHistory
+                        })
+                    });
+                    const data = await response.json();
+                    if (data.error) throw new Error(data.error.message);
+                    aiText = data.choices[0].message.content;
                 }
 
-                const aiText = data.candidates[0].content.parts[0].text;
-                document.getElementById(loadingId).innerText = aiText;
-                chatHistory.push({ role: "model", parts: [{ text: aiText }] });
+                document.getElementById(loadingId).innerHTML = parseMarkdown(aiText);
+                chatHistory.push({ role: 'ai', content: aiText });
 
             } catch (error) {
-                document.getElementById(loadingId).innerText = "Kuch error aa gaya: " + error.message;
-                chatHistory.pop();
+                document.getElementById(loadingId).innerText = "Error: " + error.message;
+                chatHistory.pop(); 
             }
         }
 
@@ -275,16 +301,14 @@
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${className}`;
             msgDiv.id = 'msg-' + Date.now();
-            msgDiv.innerText = text;
+            msgDiv.innerText = text; 
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
             return msgDiv.id;
         }
 
         function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
+            if (event.key === 'Enter') sendMessage();
         }
     </script>
 </body>
