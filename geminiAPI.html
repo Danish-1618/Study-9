@@ -4,67 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Neux AI - God Mode</title>
+
+    <!-- Markdown, Sanitizer, and LaTeX Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: #121212; color: #ffffff; 
             margin: 0; padding: 15px; 
             display: flex; flex-direction: column; 
-            /* Fallback for older browsers, 100dvh for modern mobile keyboard support */
             height: 100vh; height: 100dvh; 
             box-sizing: border-box; 
+            overflow: hidden;
         }
         
-        p{
-            color: #ccc;
-            font-size: 15px;
+        .header-container { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 10px; flex-shrink: 0; 
         }
-        .header-container {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 15px;
-        }
-        h1 { margin: 0; color: #00adb5; font-size: 22px; letter-spacing: 1px; }
+        h1 { margin: 0; color: #00adb5; font-size: 20px; letter-spacing: 1px; }
         
-        #toggle-btn {
-            background-color: #393e46; color: white; border: none; padding: 8px 12px;
-            border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.3s;
-        }
-        #toggle-btn:hover { background-color: #00adb5; color: #121212; }
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;}
+        .control-btn { background-color: #393e46; color: white; border: none; padding: 8px 12px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 13px; }
+        .control-btn:hover { background-color: #00adb5; color: #121212; }
+        #clear-btn:hover { background-color: #ff4c4c; color: white; }
 
-        #settings-panel {
-            background-color: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #333;
-            margin-bottom: 15px;
-        }
+        #settings-panel { background-color: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #333; margin-bottom: 15px; display: none; flex-shrink: 0;}
 
         .config-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; align-items: center; width: 100%; }
-        input, select, button.action-btn { padding: 12px; border-radius: 5px; border: 1px solid #333; background-color: #1e1e1e; color: white; outline: none; font-size: 14px; }
+        input, select { padding: 12px; border-radius: 5px; border: 1px solid #333; background-color: #1e1e1e; color: white; outline: none; font-size: 14px; }
         
-        #api-key-input { flex-grow: 1; min-width: 150px; }
-        #provider-select, #model-select { flex-grow: 1; min-width: 150px; }
-        
+        #api-key-input, #provider-select, #model-select { flex-grow: 1; min-width: 150px; }
         #custom-url-container { display: none; width: 100%; margin-bottom: 10px; }
         #custom-url-input { width: 100%; box-sizing: border-box; }
         
-        button.load-btn { background-color: #393e46; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
+        button.load-btn { background-color: #393e46; cursor: pointer; font-weight: bold; width: 100%; padding: 12px; border: none; border-radius: 5px; color: white; transition: 0.3s; }
         button.load-btn:hover { background-color: #00adb5; color: #121212; }
 
         #chat-box { 
             flex-grow: 1; overflow-y: auto; background-color: #1e1e1e; padding: 15px; 
             border-radius: 10px; margin-bottom: 15px; display: flex; flex-direction: column; 
-            gap: 15px; border: 1px solid #333;
+            gap: 15px; border: 1px solid #333; scroll-behavior: smooth;
         }
         
-        .message { padding: 12px 15px; border-radius: 8px; max-width: 85%; line-height: 1.5; word-wrap: break-word; font-size: 15px; }
+        .message { padding: 12px 18px; border-radius: 8px; max-width: 85%; line-height: 1.6; word-wrap: break-word; font-size: 15px; }
         .user-msg { background-color: #00adb5; color: #121212; align-self: flex-end; font-weight: 500; }
-        .ai-msg { background-color: #2d2d2d; align-self: flex-start; border: 1px solid #444; }
+        .ai-msg { background-color: #2d2d2d; align-self: flex-start; border: 1px solid #444; width: 100%; box-sizing: border-box; }
         
+        .ai-msg h1, .ai-msg h2, .ai-msg h3 { color: #00adb5; margin-top: 10px; margin-bottom: 10px; }
+        .ai-msg h2 { border-bottom: 1px solid #444; padding-bottom: 5px; }
+        .ai-msg p { margin-bottom: 10px; }
         .ai-msg img { max-width: 100%; border-radius: 8px; margin-top: 10px; }
-        .ai-msg pre { background: #000; padding: 10px; border-radius: 5px; overflow-x: auto; border: 1px solid #333; margin: 10px 0;}
-        .ai-msg code { font-family: monospace; background: #000; padding: 2px 5px; border-radius: 3px; color: #00adb5; }
-        .ai-msg strong { color: #fff; }
+        .ai-msg pre { background: #0d0d0d; padding: 12px; border-radius: 6px; overflow-x: auto; border: 1px solid #333; margin: 10px 0; }
+        .ai-msg code { font-family: 'Courier New', Courier, monospace; background: #0d0d0d; padding: 2px 5px; border-radius: 3px; color: #ff9e64; }
+        .ai-msg pre code { background: none; color: #a9b1d6; padding: 0; }
 
-        .input-container { display: flex; gap: 10px; }
-        #prompt-input { flex-grow: 1; padding: 12px; font-size: 16px; border: 1px solid #333; border-radius: 5px; }
+        .input-container { 
+            display: flex; gap: 10px; flex-shrink: 0; 
+            background-color: #121212; 
+            z-index: 10;
+        }
+        #prompt-input { flex-grow: 1; padding: 12px; font-size: 16px; border: 1px solid #333; border-radius: 5px; background: #1e1e1e; color: white;}
         button.send-btn { padding: 12px 20px; background-color: #00adb5; color: #121212; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; transition: 0.3s; }
         button.send-btn:hover { background-color: #007c82; color: white; }
     </style>
@@ -73,11 +78,17 @@
 
     <div class="header-container">
         <h1>Neux AI (God-Mode)</h1>
-        <button id="toggle-btn" onclick="toggleSettings()">⚙️ Settings</button>
+        <div class="btn-group">
+            <button class="control-btn" onclick="downloadHistory()">💾 Save</button>
+            <button class="control-btn" onclick="triggerUpload()">📂 Load</button>
+            <button class="control-btn" id="clear-btn" onclick="clearHistory()">🗑️ Clear</button>
+            <button class="control-btn" onclick="toggleSettings()">⚙️ Settings</button>
+        </div>
     </div>
     
+    <input type="file" id="upload-file" accept="*/*" style="display:none" onchange="handleFileUpload(event)">
+
     <div id="settings-panel">
-        <p>Email me For API KEY or Help</p>
         <div class="config-container">
             <select id="provider-select" onchange="handleProviderChange()">
                 <option value="gemini">Gemini API</option>
@@ -92,11 +103,11 @@
         </div>
 
         <div id="custom-url-container">
-            <input type="text" id="custom-url-input" placeholder="Enter Custom Base URL (e.g. https://api.mistral.ai/v1)">
+            <input type="text" id="custom-url-input" placeholder="Enter Custom Base URL">
         </div>
         
         <div class="config-container">
-            <button class="action-btn load-btn" id="load-models-btn" onclick="loadModels()">1. Load Models</button>
+            <button class="load-btn" id="load-models-btn" onclick="loadModels()">1. Load Models</button>
         </div>
 
         <div class="config-container">
@@ -115,6 +126,7 @@
 
     <script>
         let chatHistory = [];
+        const systemPrompt = "You are an expert Professor. Explain comprehensively from zero to hero. Use real-world examples, logical reasoning, formatting, and markdown.";
 
         const apiConfig = {
             groq: { base: 'https://api.groq.com/openai/v1' },
@@ -124,27 +136,23 @@
             openrouter: { base: 'https://openrouter.ai/api/v1' }
         };
 
-        // Panel Toggle Logic
+        window.onload = () => {
+            loadHistoryFromLocal();
+            if(!document.getElementById('api-key-input').value) {
+                document.getElementById('settings-panel').style.display = 'block';
+            }
+        };
+
         function toggleSettings() {
             const panel = document.getElementById('settings-panel');
-            if (panel.style.display === 'none') {
-                panel.style.display = 'block';
-            } else {
-                panel.style.display = 'none';
-            }
+            panel.style.display = panel.style.display === 'none' || panel.style.display === '' ? 'block' : 'none';
         }
 
         function handleProviderChange() {
             document.getElementById('model-select').innerHTML = '<option value="">Click Load Models again...</option>';
             const provider = document.getElementById('provider-select').value;
-            const customContainer = document.getElementById('custom-url-container');
-            
-            if (provider === 'custom') {
-                customContainer.style.display = 'block';
-                document.getElementById('model-select').innerHTML = '<option value="default">Custom Model (Type name below if needed)</option>';
-            } else {
-                customContainer.style.display = 'none';
-            }
+            document.getElementById('custom-url-container').style.display = provider === 'custom' ? 'block' : 'none';
+            if(provider === 'custom') document.getElementById('model-select').innerHTML = '<option value="default">Custom Model (Type below if needed)</option>';
         }
 
         async function loadModels() {
@@ -153,55 +161,31 @@
             const select = document.getElementById('model-select');
             const btn = document.getElementById('load-models-btn');
             
-            if (!apiKey) { alert("Bhai, pehle API key daal do!"); return; }
+            if (!apiKey) { alert("API key is required!"); return; }
 
             btn.innerText = "Loading Models...";
             select.innerHTML = ''; 
 
             try {
                 let models = [];
-
                 if (provider === 'gemini') {
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
                     const json = await res.json();
                     if (json.error) throw new Error(json.error.message);
-                    models = json.models
-                        .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent"))
-                        .map(m => ({ id: m.name, name: m.displayName || m.name }));
-                } 
-                else {
-                    let baseUrl = provider === 'custom' ? document.getElementById('custom-url-input').value.trim() : apiConfig[provider].base;
-                    if (provider === 'custom' && !baseUrl) throw new Error("Custom URL daalna padega!");
-
-                    if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
-
-                    const res = await fetch(`${baseUrl}/models`, {
-                        headers: { 'Authorization': `Bearer ${apiKey}` }
-                    });
-                    
-                    if (!res.ok) {
-                        models = [{ id: "default", name: "Manual Entry / Default Model" }];
-                    } else {
-                        const json = await res.json();
-                        if (json.error) throw new Error(json.error.message);
-                        models = json.data.map(m => ({ id: m.id, name: m.id }));
-                    }
-                }
-
-                if (models.length === 0) {
-                    select.innerHTML = '<option value="">Koi valid model nahi mila</option>';
+                    models = json.models.filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent")).map(m => ({ id: m.name, name: m.displayName || m.name }));
                 } else {
-                    models.forEach(model => {
-                        let opt = document.createElement('option');
-                        opt.value = model.id;
-                        opt.innerText = model.name;
-                        select.appendChild(opt);
-                    });
+                    let baseUrl = provider === 'custom' ? document.getElementById('custom-url-input').value.trim() : apiConfig[provider].base;
+                    if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+                    const res = await fetch(`${baseUrl}/models`, { headers: { 'Authorization': `Bearer ${apiKey}` } });
+                    if (!res.ok) models = [{ id: "default", name: "Manual Entry / Default Model" }];
+                    else { const json = await res.json(); models = json.data.map(m => ({ id: m.id, name: m.id })); }
                 }
+
+                if (models.length === 0) select.innerHTML = '<option value="">No valid models found</option>';
+                else models.forEach(m => { let opt = document.createElement('option'); opt.value = m.id; opt.innerText = m.name; select.appendChild(opt); });
 
                 btn.innerText = "Loaded Successfully!";
                 setTimeout(() => btn.innerText = "1. Load Models", 2000);
-
             } catch (error) {
                 alert("Error: " + error.message);
                 btn.innerText = "1. Load Models";
@@ -209,14 +193,105 @@
             }
         }
 
-        function parseMarkdown(text) {
-            return text
-                .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" style="max-width:100%; border-radius:8px;">')
-                .replace(/```([\s\S]*?)```/g, '<pre style="background:#000; padding:10px; overflow-x:auto;"><code>$1</code></pre>')
-                .replace(/`([^`]+)`/g, '<code style="background:#000; color:#00adb5; padding:2px 4px;">$1</code>')
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/\n/g, '<br>');
+        function formatAndRender(text, element) {
+            let rawHtml = marked.parse(text);
+            let safeHtml = DOMPurify.sanitize(rawHtml);
+            element.innerHTML = safeHtml;
+            renderMathInElement(element, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '\\[', right: '\\]', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false}
+                ],
+                throwOnError: false
+            });
+        }
+
+        function saveHistoryToLocal() {
+            localStorage.setItem('neuxHistory', JSON.stringify(chatHistory));
+        }
+
+        function renderFullHistory() {
+            document.getElementById('chat-box').innerHTML = '';
+            chatHistory.forEach(msg => {
+                const msgDiv = createMessageDiv(msg.role === 'user' ? 'user-msg' : 'ai-msg');
+                if (msg.role === 'user') msgDiv.innerText = msg.content;
+                else formatAndRender(msg.content, msgDiv);
+            });
+        }
+
+        function loadHistoryFromLocal() {
+            const saved = localStorage.getItem('neuxHistory');
+            if (saved) {
+                chatHistory = JSON.parse(saved);
+                renderFullHistory();
+            }
+        }
+
+        function clearHistory() {
+            if(confirm("Are you sure you want to clear the entire chat history?")) {
+                chatHistory = [];
+                localStorage.removeItem('neuxHistory');
+                document.getElementById('chat-box').innerHTML = '';
+            }
+        }
+
+        // --- UPDATED: DOWNLOAD HISTORY WITH CUSTOM NAME ---
+        function downloadHistory() {
+            if(chatHistory.length === 0) { 
+                alert("Chat is empty, nothing to save!"); 
+                return; 
+            }
+            
+            // यूज़र से फाइल का नाम पूछने वाला पॉपअप
+            let fileName = prompt("Enter a name for this chat history file (e.g., Biology_Notes):", "My_Research");
+            
+            // अगर यूज़र Cancel कर दे या कुछ ना लिखे, तो फाइल सेव मत करो
+            if (!fileName) return;
+
+            // यह सुनिश्चित करना कि फाइल के आखिर में ".json" ज़रूर लगा हो
+            if (!fileName.endsWith(".json")) {
+                fileName += ".json";
+            }
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(chatHistory));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", fileName); // यहाँ यूज़र का दिया नाम सेट हो जाएगा
+            dlAnchorElem.click();
+        }
+
+        function triggerUpload() {
+            document.getElementById('upload-file').click();
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedHistory = JSON.parse(e.target.result);
+                    chatHistory = importedHistory;
+                    saveHistoryToLocal(); 
+                    renderFullHistory();
+                    alert("History Loaded Successfully! 🚀");
+                } catch(err) {
+                    alert("Invalid history file! Only select a previously saved JSON file.");
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ""; 
+        }
+
+        function createMessageDiv(className) {
+            const chatBox = document.getElementById('chat-box');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${className}`;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return msgDiv;
         }
 
         async function sendMessage() {
@@ -226,90 +301,60 @@
             const promptInput = document.getElementById('prompt-input');
             const userText = promptInput.value.trim();
 
-            if (!apiKey) { alert("API key daalo!"); return; }
+            if (!apiKey) { alert("API key required!"); return; }
             if (!userText) return;
 
-            // Auto-hide settings when user starts chatting
             document.getElementById('settings-panel').style.display = 'none';
 
-            appendMessage(userText, 'user-msg');
+            const userDiv = createMessageDiv('user-msg');
+            userDiv.innerText = userText;
             promptInput.value = '';
 
             chatHistory.push({ role: 'user', content: userText });
-            const loadingId = appendMessage("Thinking...", 'ai-msg');
+            saveHistoryToLocal();
 
-            const systemPrompt = "You are an expert Professor. Explain comprehensively from zero to hero. Use real-world examples, logical reasoning, formatting, and markdown.";
+            const aiDiv = createMessageDiv('ai-msg');
+            aiDiv.innerText = "Thinking...";
 
             try {
                 let aiText;
-
                 if (provider === 'gemini') {
-                    const geminiHistory = chatHistory.map(msg => ({
-                        role: msg.role === 'ai' ? 'model' : 'user',
-                        parts: [{ text: msg.content }]
-                    }));
-                    
+                    const geminiHistory = chatHistory.map(msg => ({ role: msg.role === 'ai' ? 'model' : 'user', parts: [{ text: msg.content }] }));
                     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${apiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            system_instruction: { parts: [{ text: systemPrompt }] },
-                            contents: geminiHistory
-                        })
+                        body: JSON.stringify({ system_instruction: { parts: [{ text: systemPrompt }] }, contents: geminiHistory })
                     });
                     const data = await response.json();
                     if (data.error) throw new Error(data.error.message);
                     aiText = data.candidates[0].content.parts[0].text;
-                } 
-                else {
+                } else {
                     let baseUrl = provider === 'custom' ? document.getElementById('custom-url-input').value.trim() : apiConfig[provider].base;
                     if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
-
-                    const openaiHistory = chatHistory.map(msg => ({
-                        role: msg.role === 'ai' ? 'assistant' : 'user',
-                        content: msg.content
-                    }));
+                    const openaiHistory = chatHistory.map(msg => ({ role: msg.role === 'ai' ? 'assistant' : 'user', content: msg.content }));
                     openaiHistory.unshift({ role: "system", content: systemPrompt });
 
                     const response = await fetch(`${baseUrl}/chat/completions`, {
                         method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${apiKey}`
-                        },
-                        body: JSON.stringify({
-                            model: model === 'default' ? prompt("Enter exact model name (e.g. llama-3-8b):") || 'default' : model,
-                            messages: openaiHistory
-                        })
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                        body: JSON.stringify({ model: model === 'default' ? prompt("Enter exact model name:") || 'default' : model, messages: openaiHistory })
                     });
                     const data = await response.json();
                     if (data.error) throw new Error(data.error.message);
                     aiText = data.choices[0].message.content;
                 }
 
-                document.getElementById(loadingId).innerHTML = parseMarkdown(aiText);
+                formatAndRender(aiText, aiDiv);
                 chatHistory.push({ role: 'ai', content: aiText });
-
+                saveHistoryToLocal();
             } catch (error) {
-                document.getElementById(loadingId).innerText = "Error: " + error.message;
+                aiDiv.innerText = "Error: " + error.message;
                 chatHistory.pop(); 
+                saveHistoryToLocal();
             }
         }
 
-        function appendMessage(text, className) {
-            const chatBox = document.getElementById('chat-box');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${className}`;
-            msgDiv.id = 'msg-' + Date.now();
-            msgDiv.innerText = text; 
-            chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            return msgDiv.id;
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') sendMessage();
-        }
+        function handleKeyPress(event) { if (event.key === 'Enter') sendMessage(); }
     </script>
 </body>
 </html>
