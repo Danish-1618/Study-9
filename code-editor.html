@@ -7,145 +7,121 @@
   <title>Study 9 Code Lab</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    :root { --ink: #102a43; --blue: #005cb9; --panel: #0f172a; --muted: #9fb3c8; }
-    body { min-height: 100vh; background: #f4f7fb; color: var(--ink); }
-    .lab-header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 5%; background:#fff; border-bottom:1px solid #d9e2ec; }
-    .lab-header h1 { margin:0; color:var(--blue); font-size:clamp(1.3rem, 3vw, 2rem); }
-    .lab-header a { color:var(--blue); font-weight:700; text-decoration:none; }
-    .lab { width:min(1200px, 92%); margin:24px auto; }
-    .lab-intro { margin-bottom:18px; }
-    .lab-intro h2 { margin:0 0 6px; }
+    :root { --bg:#0b1220; --panel:#111827; --panel-2:#172235; --border:#29384d; --text:#dbeafe; --muted:#91a4bb; --accent:#38bdf8; --green:#22c55e; --editor:#0a101b; }
+    * { box-sizing:border-box; }
+    body { min-height:100vh; margin:0; background:#f4f7fb; color:#102a43; font-family:Inter,ui-sans-serif,system-ui,sans-serif; }
+    .lab-header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:13px 4%; background:#fff; border-bottom:1px solid #d9e2ec; }
+    .brand { display:flex; align-items:center; gap:10px; }
+    .brand h1 { margin:0; color:#005cb9; font-size:clamp(1.2rem,3vw,1.7rem); }
+    .brand small { color:#627d98; }
+    .lab-header a { color:#005cb9; font-weight:700; text-decoration:none; }
+    .lab { width:min(1280px,96%); margin:18px auto; }
+    .lab-intro { margin-bottom:14px; }
+    .lab-intro h2 { margin:0 0 4px; }
     .lab-intro p { margin:0; color:#52606d; }
-    .toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:16px 0; }
-    .toolbar label { font-weight:700; }
-    select, button { border:1px solid #bcccdc; border-radius:7px; padding:10px 14px; font:inherit; }
-    select { background:#fff; }
-    button { cursor:pointer; font-weight:700; background:#fff; color:var(--ink); }
-    #run-btn { background:var(--blue); color:#fff; border-color:var(--blue); }
+    .workspace { display:grid; grid-template-columns:220px minmax(0,1fr); min-height:650px; overflow:hidden; border:1px solid var(--border); border-radius:10px; background:var(--panel); box-shadow:0 8px 24px #102a4322; }
+    .sidebar { background:#0d1727; border-right:1px solid var(--border); color:var(--text); }
+    .sidebar-title { display:flex; justify-content:space-between; align-items:center; padding:13px 12px; color:var(--muted); font-size:.75rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    .file-list { padding:0 7px; }
+    .file-row { display:flex; align-items:center; gap:7px; width:100%; padding:8px 5px 8px 10px; border:0; border-radius:5px; background:transparent; color:var(--text); text-align:left; font:inherit; cursor:pointer; }
+    .file-row:hover, .file-row.active { background:#1e3550; }
+    .file-icon { width:20px; text-align:center; }
+    .file-name { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .dots { padding:1px 5px; border:0; border-radius:4px; background:transparent; color:var(--muted); font-size:1.1rem; line-height:1; cursor:pointer; }
+    .dots:hover { background:#2a4767; color:#fff; }
+    .sidebar-note { margin:18px 12px; padding:10px; border:1px solid #29415e; border-radius:6px; color:var(--muted); font-size:.78rem; line-height:1.45; }
+    .main-pane { display:flex; min-width:0; flex-direction:column; background:var(--panel); }
+    .toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--border); color:var(--text); }
+    .toolbar label { color:var(--muted); font-size:.85rem; }
+    select, button { border:1px solid #3b5069; border-radius:6px; padding:8px 12px; font:inherit; }
+    select, .toolbar button { background:#17263a; color:var(--text); }
+    button { cursor:pointer; font-weight:700; }
+    #run-btn { background:#16803c; border-color:#22c55e; color:#fff; }
+    #run-btn:hover { background:#1ca34d; }
     #run-btn:disabled { opacity:.65; cursor:wait; }
-    #reset-btn:hover, #home-btn:hover { border-color:var(--blue); color:var(--blue); }
-    .editor-layout { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:16px; }
-    .editor-card, .output-card { overflow:hidden; border-radius:10px; background:var(--panel); box-shadow:0 5px 18px #102a431c; }
-    .card-title { display:flex; justify-content:space-between; align-items:center; padding:10px 14px; color:#fff; font-weight:700; border-bottom:1px solid #334155; }
-    .status { color:var(--muted); font-size:.85rem; font-weight:400; }
-    #code-editor { display:block; width:100%; min-height:440px; resize:vertical; padding:16px; border:0; outline:0; color:#e2e8f0; background:#0b1220; font:14px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; tab-size:4; }
-    #output { min-height:440px; margin:0; padding:16px; overflow:auto; white-space:pre-wrap; color:#d1fae5; font:14px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; }
-    #preview { display:none; width:100%; height:440px; border:0; background:#fff; }
-    .hint { margin-top:14px; color:#52606d; font-size:.9rem; }
-    @media (max-width: 760px) { .editor-layout { grid-template-columns:1fr; } #code-editor, #output, #preview { min-height:320px; height:320px; } }
+    .status { margin-left:auto; color:var(--muted); font-size:.8rem; }
+    .editor-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); flex:1; min-height:0; gap:1px; background:var(--border); }
+    .editor-card, .output-card { min-width:0; background:var(--editor); }
+    .card-title { display:flex; justify-content:space-between; align-items:center; padding:9px 13px; border-bottom:1px solid var(--border); color:var(--text); font-size:.84rem; font-weight:700; }
+    .card-title span:last-child { color:var(--muted); font-size:.75rem; font-weight:400; }
+    #code-editor { display:block; width:100%; height:510px; resize:vertical; padding:15px; border:0; outline:0; color:#dbeafe; background:var(--editor); font:14px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace; tab-size:4; }
+    #output { min-height:510px; margin:0; padding:15px; overflow:auto; white-space:pre-wrap; color:#bbf7d0; background:var(--editor); font:14px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace; }
+    #preview { display:none; width:100%; height:510px; border:0; background:#fff; }
+    .hint { margin:11px 0 0; color:#52606d; font-size:.85rem; }
+    .shortcut { padding:2px 5px; border:1px solid #506783; border-radius:4px; color:var(--muted); font-size:.72rem; }
+    .menu { position:fixed; z-index:20; display:none; min-width:150px; padding:5px; border:1px solid #49617d; border-radius:6px; background:#17263a; box-shadow:0 8px 24px #0008; }
+    .menu button { display:block; width:100%; border:0; border-radius:4px; background:transparent; color:#fff; text-align:left; }
+    .menu button:hover { background:#2a4767; }
+    body.light-theme { --panel:#fff; --panel-2:#f1f5f9; --border:#cbd5e1; --text:#102a43; --muted:#52606d; --editor:#f8fafc; }
+    body.light-theme .workspace, body.light-theme .main-pane { background:#fff; }
+    body.light-theme .sidebar { background:#eef4f9; }
+    body.light-theme #code-editor, body.light-theme #output { color:#102a43; }
+    @media (max-width:760px) { .workspace { grid-template-columns:1fr; } .sidebar { border-right:0; border-bottom:1px solid var(--border); } .file-list { display:flex; overflow-x:auto; } .file-row { min-width:145px; } .sidebar-note { display:none; } .editor-layout { grid-template-columns:1fr; } #code-editor,#output,#preview { height:300px; min-height:300px; } .status { width:100%; margin-left:0; } }
   </style>
 </head>
 <body>
   <header class="lab-header">
-    <h1>Study 9 Code Lab</h1>
-    <a id="home-btn" href="index.html">← Back to Study 9</a>
+    <div class="brand"><h1>Study 9 Code Lab</h1><small>browser workspace</small></div>
+    <a href="index.html">← Back to Study 9</a>
   </header>
   <main class="lab">
-    <section class="lab-intro">
-      <h2>Write and run code online</h2>
-      <p>Start with <strong>main.py</strong>, edit the example, and run it in your browser. No installation is required.</p>
+    <section class="lab-intro"><h2>Write and run code online</h2><p>Edit files, use familiar shortcuts, and download your work directly to your device.</p></section>
+    <section class="workspace" aria-label="Study 9 code workspace">
+      <aside class="sidebar">
+        <div class="sidebar-title"><span>Explorer</span><span>Study 9</span></div>
+        <div id="file-list" class="file-list"></div>
+        <p class="sidebar-note">Tip: <b>Ctrl/Cmd + Enter</b> runs code. <b>Ctrl/Cmd + S</b> downloads the active file.</p>
+      </aside>
+      <section class="main-pane">
+        <div class="toolbar">
+          <label for="language">Runtime</label>
+          <select id="language" aria-label="Programming language"><option value="python">Python</option><option value="javascript">JavaScript</option><option value="html">HTML preview</option></select>
+          <button id="run-btn" type="button">▶ Run code</button><button id="reset-btn" type="button">Reset file</button><button id="theme-btn" type="button">☼ Theme</button>
+          <span class="shortcut">Ctrl/Cmd + Enter</span><span id="status" class="status" role="status">Python runtime loads on first run…</span>
+        </div>
+        <div class="editor-layout">
+          <div class="editor-card"><div class="card-title"><span id="filename">main.py</span><span>Editor</span></div><textarea id="code-editor" spellcheck="false" aria-label="Code editor"></textarea></div>
+          <div class="output-card"><div class="card-title"><span>Output</span><span id="output-status">Ready</span></div><pre id="output">Click “Run code” to see the output.</pre><iframe id="preview" title="Code preview" sandbox="allow-scripts"></iframe></div>
+        </div>
+      </section>
     </section>
-    <div class="toolbar">
-      <label for="language">Language</label>
-      <select id="language" aria-label="Programming language">
-        <option value="python">Python (main.py)</option>
-        <option value="javascript">JavaScript</option>
-        <option value="html">HTML</option>
-      </select>
-      <button id="run-btn" type="button">▶ Run code</button>
-      <button id="reset-btn" type="button">Reset example</button>
-      <span id="status" class="status" role="status">Python runtime loads on first run…</span>
-    </div>
-    <section class="editor-layout" aria-label="Code editor and output">
-      <div class="editor-card">
-        <div class="card-title"><span id="filename">main.py</span><span>Editor</span></div>
-        <textarea id="code-editor" spellcheck="false" aria-label="Code editor"></textarea>
-      </div>
-      <div class="output-card">
-        <div class="card-title"><span>Output</span><span id="output-status" class="status">Ready</span></div>
-        <pre id="output">Click “Run code” to see the output.</pre>
-        <iframe id="preview" title="Code preview" sandbox="allow-scripts"></iframe>
-      </div>
-    </section>
-    <p class="hint">Python runs safely through Pyodide in the browser. JavaScript and HTML run in an isolated preview. Internet access is required the first time Python is run.</p>
+    <p class="hint">Python runs through Pyodide in the browser. JavaScript and HTML run locally in an isolated preview. Internet is needed the first time Python is run.</p>
   </main>
+  <div id="file-menu" class="menu" role="menu"><button id="download-file" type="button">⬇ Download file</button></div>
 
   <script>
-    const examples = {
-      python: 'print("Hello from Study 9!")\n\nname = "Danish"\nfor number in range(1, 4):\n    print(f"{number}. Keep learning, {name}!")',
-      javascript: 'const name = "Danish";\nconsole.log(`Hello from Study 9, ${name}!`);\nconsole.log(2 + 2);',
-      html: '<!doctype html>\n<html>\n  <body>\n    <h2>Hello from Study 9!</h2>\n    <p>Edit this HTML and click Run code.</p>\n  </body>\n</html>'
+    const files = {
+      'main.py': { language:'python', code:'print("Hello from Study 9!")\n\nname = "Danish"\nfor number in range(1, 4):\n    print(f"{number}. Keep learning, {name}!")' },
+      'main.js': { language:'javascript', code:'const name = "Danish";\nconsole.log(`Hello from Study 9, ${name}!`);\nconsole.log(2 + 2);' },
+      'index.html': { language:'html', code:'<!doctype html>\n<html>\n  <body>\n    <h2>Hello from Study 9!</h2>\n    <p>Edit this HTML and click Run code.</p>\n  </body>\n</html>' }
     };
-    const language = document.getElementById('language');
-    const editor = document.getElementById('code-editor');
-    const output = document.getElementById('output');
-    const preview = document.getElementById('preview');
-    const runButton = document.getElementById('run-btn');
-    const status = document.getElementById('status');
-    const outputStatus = document.getElementById('output-status');
+    let activeFile = 'main.py';
     let pyodidePromise;
+    const language = document.getElementById('language'), editor = document.getElementById('code-editor'), output = document.getElementById('output'), preview = document.getElementById('preview'), runButton = document.getElementById('run-btn'), status = document.getElementById('status'), outputStatus = document.getElementById('output-status'), menu = document.getElementById('file-menu');
+    const icon = name => name.endsWith('.py') ? '🐍' : name.endsWith('.js') ? '⚡' : '🌐';
 
-    function updateEditor() {
-      const selected = language.value;
-      editor.value = examples[selected];
-      document.getElementById('filename').textContent = selected === 'python' ? 'main.py' : selected === 'javascript' ? 'main.js' : 'index.html';
-      output.textContent = selected === 'html' ? '' : 'Click “Run code” to see the output.';
-      output.style.display = selected === 'html' ? 'none' : 'block';
-      preview.style.display = selected === 'html' ? 'block' : 'none';
-      outputStatus.textContent = 'Ready';
-    }
+    function renderFiles() { document.getElementById('file-list').innerHTML = Object.keys(files).map(name => `<button class="file-row ${name === activeFile ? 'active' : ''}" data-file="${name}"><span class="file-icon">${icon(name)}</span><span class="file-name">${name}</span><span class="dots" data-menu="${name}" aria-label="File actions">⋯</span></button>`).join(''); }
+    function selectFile(name) { if (activeFile) files[activeFile].code = editor.value; activeFile = name; language.value = files[name].language; editor.value = files[name].code; document.getElementById('filename').textContent = name; output.textContent = name === 'index.html' ? '' : 'Click “Run code” to see the output.'; output.style.display = name === 'index.html' ? 'none' : 'block'; preview.style.display = name === 'index.html' ? 'block' : 'none'; outputStatus.textContent = 'Ready'; renderFiles(); closeMenu(); }
+    function extension() { return activeFile.split('.').pop(); }
+    function downloadFile(name = activeFile) { if (name === activeFile) files[name].code = editor.value; const blob = new Blob([files[name].code], { type:'text/plain;charset=utf-8' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = name; document.body.appendChild(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(link.href), 500); closeMenu(); }
+    function openMenu(event, name) { event.stopPropagation(); const rect = event.currentTarget.getBoundingClientRect(); menu.style.left = `${Math.min(rect.left, innerWidth - 165)}px`; menu.style.top = `${rect.bottom + 4}px`; menu.style.display = 'block'; menu.dataset.file = name; }
+    function closeMenu() { menu.style.display = 'none'; delete menu.dataset.file; }
 
-    async function loadPython() {
-      if (!pyodidePromise) {
-        status.textContent = 'Loading Python runtime…';
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js';
-        document.head.appendChild(script);
-        pyodidePromise = new Promise((resolve, reject) => {
-          script.onload = async () => { try { resolve(await loadPyodide()); } catch (error) { reject(error); } };
-          script.onerror = () => reject(new Error('Could not load the Python runtime. Check your internet connection.'));
-        });
-      }
-      return pyodidePromise;
-    }
+    document.getElementById('file-list').addEventListener('click', event => { const dots = event.target.closest('[data-menu]'); if (dots) return openMenu(event, dots.dataset.menu); const row = event.target.closest('[data-file]'); if (row) selectFile(row.dataset.file); });
+    document.getElementById('download-file').addEventListener('click', () => downloadFile(menu.dataset.file));
+    document.addEventListener('click', event => { if (!event.target.closest('#file-menu')) closeMenu(); });
+    language.addEventListener('change', () => { const target = Object.keys(files).find(name => files[name].language === language.value); if (target) selectFile(target); });
+    document.getElementById('reset-btn').addEventListener('click', () => { files[activeFile].code = files[activeFile].code; selectFile(activeFile); });
+    document.getElementById('theme-btn').addEventListener('click', () => document.body.classList.toggle('light-theme'));
+    editor.addEventListener('input', () => { files[activeFile].code = editor.value; });
 
-    async function runPython(code) {
-      const pyodide = await loadPython();
-      pyodide.setStdout({ batched: text => { output.textContent += text; } });
-      pyodide.setStderr({ batched: text => { output.textContent += text; } });
-      await pyodide.runPythonAsync(code);
-    }
-
-    async function runJavaScript(code) {
-      const messages = [];
-      const originalLog = console.log;
-      const originalWarn = console.warn;
-      const originalError = console.error;
-      const capture = (...args) => messages.push(args.map(String).join(' '));
-      console.log = console.warn = console.error = capture;
-      try { new Function(code)(); } finally { console.log = originalLog; console.warn = originalWarn; console.error = originalError; }
-      output.textContent = messages.join('\n') || 'Code ran successfully (no console output).';
-    }
-
-    async function runCode() {
-      runButton.disabled = true;
-      outputStatus.textContent = 'Running…';
-      output.textContent = '';
-      try {
-        if (language.value === 'python') { await runPython(editor.value); status.textContent = 'Python ready'; }
-        else if (language.value === 'javascript') await runJavaScript(editor.value);
-        else { preview.srcdoc = editor.value; }
-        if (language.value === 'python' && !output.textContent) output.textContent = 'Code ran successfully (no output).';
-        outputStatus.textContent = 'Finished';
-      } catch (error) { output.textContent = `${error.name || 'Error'}: ${error.message || error}`; outputStatus.textContent = 'Error'; }
-      finally { runButton.disabled = false; }
-    }
-
-    language.addEventListener('change', updateEditor);
+    async function loadPython() { if (!pyodidePromise) { status.textContent = 'Loading Python runtime…'; const script = document.createElement('script'); script.src = 'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js'; document.head.appendChild(script); pyodidePromise = new Promise((resolve, reject) => { script.onload = async () => { try { resolve(await loadPyodide()); } catch (error) { reject(error); } }; script.onerror = () => reject(new Error('Could not load Python. Check your internet connection.')); }); } return pyodidePromise; }
+    async function runPython(code) { const pyodide = await loadPython(); pyodide.setStdout({ batched:text => output.textContent += text }); pyodide.setStderr({ batched:text => output.textContent += text }); await pyodide.runPythonAsync(code); }
+    async function runJavaScript(code) { const messages = [], original = [console.log, console.warn, console.error], capture = (...args) => messages.push(args.map(String).join(' ')); console.log = console.warn = console.error = capture; try { new Function(code)(); } finally { [console.log, console.warn, console.error] = original; } output.textContent = messages.join('\n') || 'Code ran successfully (no console output).'; }
+    async function runCode() { runButton.disabled = true; outputStatus.textContent = 'Running…'; output.textContent = ''; try { if (language.value === 'python') { await runPython(editor.value); status.textContent = 'Python ready'; } else if (language.value === 'javascript') await runJavaScript(editor.value); else preview.srcdoc = editor.value; if (language.value === 'python' && !output.textContent) output.textContent = 'Code ran successfully (no output).'; outputStatus.textContent = 'Finished'; } catch (error) { output.textContent = `${error.name || 'Error'}: ${error.message || error}`; outputStatus.textContent = 'Error'; } finally { runButton.disabled = false; } }
     runButton.addEventListener('click', runCode);
-    document.getElementById('reset-btn').addEventListener('click', updateEditor);
-    editor.addEventListener('keydown', event => { if (event.key === 'Tab') { event.preventDefault(); document.execCommand('insertText', false, '    '); } });
-    updateEditor();
+    editor.addEventListener('keydown', event => { if (event.key === 'Tab') { event.preventDefault(); document.execCommand('insertText', false, '    '); } if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') { event.preventDefault(); runCode(); } if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') { event.preventDefault(); downloadFile(); } });
+    renderFiles(); selectFile(activeFile);
   </script>
 </body>
 </html>
