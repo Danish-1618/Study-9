@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Study 9 online code editor and runner for Python, JavaScript, HTML, and CSS.">
+  <title>Study 9 Code Lab</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root { --ink: #102a43; --blue: #005cb9; --panel: #0f172a; --muted: #9fb3c8; }
+    body { min-height: 100vh; background: #f4f7fb; color: var(--ink); }
+    .lab-header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 5%; background:#fff; border-bottom:1px solid #d9e2ec; }
+    .lab-header h1 { margin:0; color:var(--blue); font-size:clamp(1.3rem, 3vw, 2rem); }
+    .lab-header a { color:var(--blue); font-weight:700; text-decoration:none; }
+    .lab { width:min(1200px, 92%); margin:24px auto; }
+    .lab-intro { margin-bottom:18px; }
+    .lab-intro h2 { margin:0 0 6px; }
+    .lab-intro p { margin:0; color:#52606d; }
+    .toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:16px 0; }
+    .toolbar label { font-weight:700; }
+    select, button { border:1px solid #bcccdc; border-radius:7px; padding:10px 14px; font:inherit; }
+    select { background:#fff; }
+    button { cursor:pointer; font-weight:700; background:#fff; color:var(--ink); }
+    #run-btn { background:var(--blue); color:#fff; border-color:var(--blue); }
+    #run-btn:disabled { opacity:.65; cursor:wait; }
+    #reset-btn:hover, #home-btn:hover { border-color:var(--blue); color:var(--blue); }
+    .editor-layout { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:16px; }
+    .editor-card, .output-card { overflow:hidden; border-radius:10px; background:var(--panel); box-shadow:0 5px 18px #102a431c; }
+    .card-title { display:flex; justify-content:space-between; align-items:center; padding:10px 14px; color:#fff; font-weight:700; border-bottom:1px solid #334155; }
+    .status { color:var(--muted); font-size:.85rem; font-weight:400; }
+    #code-editor { display:block; width:100%; min-height:440px; resize:vertical; padding:16px; border:0; outline:0; color:#e2e8f0; background:#0b1220; font:14px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; tab-size:4; }
+    #output { min-height:440px; margin:0; padding:16px; overflow:auto; white-space:pre-wrap; color:#d1fae5; font:14px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; }
+    #preview { display:none; width:100%; height:440px; border:0; background:#fff; }
+    .hint { margin-top:14px; color:#52606d; font-size:.9rem; }
+    @media (max-width: 760px) { .editor-layout { grid-template-columns:1fr; } #code-editor, #output, #preview { min-height:320px; height:320px; } }
+  </style>
+</head>
+<body>
+  <header class="lab-header">
+    <h1>Study 9 Code Lab</h1>
+    <a id="home-btn" href="index.html">← Back to Study 9</a>
+  </header>
+  <main class="lab">
+    <section class="lab-intro">
+      <h2>Write and run code online</h2>
+      <p>Start with <strong>main.py</strong>, edit the example, and run it in your browser. No installation is required.</p>
+    </section>
+    <div class="toolbar">
+      <label for="language">Language</label>
+      <select id="language" aria-label="Programming language">
+        <option value="python">Python (main.py)</option>
+        <option value="javascript">JavaScript</option>
+        <option value="html">HTML</option>
+      </select>
+      <button id="run-btn" type="button">▶ Run code</button>
+      <button id="reset-btn" type="button">Reset example</button>
+      <span id="status" class="status" role="status">Python runtime loads on first run…</span>
+    </div>
+    <section class="editor-layout" aria-label="Code editor and output">
+      <div class="editor-card">
+        <div class="card-title"><span id="filename">main.py</span><span>Editor</span></div>
+        <textarea id="code-editor" spellcheck="false" aria-label="Code editor"></textarea>
+      </div>
+      <div class="output-card">
+        <div class="card-title"><span>Output</span><span id="output-status" class="status">Ready</span></div>
+        <pre id="output">Click “Run code” to see the output.</pre>
+        <iframe id="preview" title="Code preview" sandbox="allow-scripts"></iframe>
+      </div>
+    </section>
+    <p class="hint">Python runs safely through Pyodide in the browser. JavaScript and HTML run in an isolated preview. Internet access is required the first time Python is run.</p>
+  </main>
+
+  <script>
+    const examples = {
+      python: 'print("Hello from Study 9!")\n\nname = "Danish"\nfor number in range(1, 4):\n    print(f"{number}. Keep learning, {name}!")',
+      javascript: 'const name = "Danish";\nconsole.log(`Hello from Study 9, ${name}!`);\nconsole.log(2 + 2);',
+      html: '<!doctype html>\n<html>\n  <body>\n    <h2>Hello from Study 9!</h2>\n    <p>Edit this HTML and click Run code.</p>\n  </body>\n</html>'
+    };
+    const language = document.getElementById('language');
+    const editor = document.getElementById('code-editor');
+    const output = document.getElementById('output');
+    const preview = document.getElementById('preview');
+    const runButton = document.getElementById('run-btn');
+    const status = document.getElementById('status');
+    const outputStatus = document.getElementById('output-status');
+    let pyodidePromise;
+
+    function updateEditor() {
+      const selected = language.value;
+      editor.value = examples[selected];
+      document.getElementById('filename').textContent = selected === 'python' ? 'main.py' : selected === 'javascript' ? 'main.js' : 'index.html';
+      output.textContent = selected === 'html' ? '' : 'Click “Run code” to see the output.';
+      output.style.display = selected === 'html' ? 'none' : 'block';
+      preview.style.display = selected === 'html' ? 'block' : 'none';
+      outputStatus.textContent = 'Ready';
+    }
+
+    async function loadPython() {
+      if (!pyodidePromise) {
+        status.textContent = 'Loading Python runtime…';
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js';
+        document.head.appendChild(script);
+        pyodidePromise = new Promise((resolve, reject) => {
+          script.onload = async () => { try { resolve(await loadPyodide()); } catch (error) { reject(error); } };
+          script.onerror = () => reject(new Error('Could not load the Python runtime. Check your internet connection.'));
+        });
+      }
+      return pyodidePromise;
+    }
+
+    async function runPython(code) {
+      const pyodide = await loadPython();
+      pyodide.setStdout({ batched: text => { output.textContent += text; } });
+      pyodide.setStderr({ batched: text => { output.textContent += text; } });
+      await pyodide.runPythonAsync(code);
+    }
+
+    async function runJavaScript(code) {
+      const messages = [];
+      const originalLog = console.log;
+      const originalWarn = console.warn;
+      const originalError = console.error;
+      const capture = (...args) => messages.push(args.map(String).join(' '));
+      console.log = console.warn = console.error = capture;
+      try { new Function(code)(); } finally { console.log = originalLog; console.warn = originalWarn; console.error = originalError; }
+      output.textContent = messages.join('\n') || 'Code ran successfully (no console output).';
+    }
+
+    async function runCode() {
+      runButton.disabled = true;
+      outputStatus.textContent = 'Running…';
+      output.textContent = '';
+      try {
+        if (language.value === 'python') { await runPython(editor.value); status.textContent = 'Python ready'; }
+        else if (language.value === 'javascript') await runJavaScript(editor.value);
+        else { preview.srcdoc = editor.value; }
+        if (language.value === 'python' && !output.textContent) output.textContent = 'Code ran successfully (no output).';
+        outputStatus.textContent = 'Finished';
+      } catch (error) { output.textContent = `${error.name || 'Error'}: ${error.message || error}`; outputStatus.textContent = 'Error'; }
+      finally { runButton.disabled = false; }
+    }
+
+    language.addEventListener('change', updateEditor);
+    runButton.addEventListener('click', runCode);
+    document.getElementById('reset-btn').addEventListener('click', updateEditor);
+    editor.addEventListener('keydown', event => { if (event.key === 'Tab') { event.preventDefault(); document.execCommand('insertText', false, '    '); } });
+    updateEditor();
+  </script>
+</body>
+</html>
