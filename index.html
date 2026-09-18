@@ -8,157 +8,86 @@
     <!-- 1. Google Search के लिए Title (60 Characters के अंदर) -->
     <title>Study 9 - Class 9 Notes & Video Lectures by Danish</title>
     
-    <!-- 2. Google Search के लिए Description (जो सर्च रिज़ल्ट में लिंक के नीचे दिखता है) -->
+    <!-- 2. Google Search के लिए Description (जो सर्च रिजल्ट में लिंक के नीचे दिखता है) -->
     <meta name="description" content="Study 9 is a free educational platform by Mohammad Danish providing Class 9 Maths, Science, History notes, PDFs, and video lectures.">
-    
-    <!-- 3. सर्च Keywords -->
     <meta name="keywords" content="Study 9, Class 9 notes, NCERT class 9, Mohammad Danish, Math_1.618, Class 9 Hindi PDF, 9th grade biology">
-    
-    <!-- 4. Author का नाम -->
     <meta name="author" content="Mohammad Danish">
-
-    <!-- 5. Google Search Console वेरिफिकेशन कोड (जब आप Google Console में HTML tag चुनेंगे, तो वो कोड यहाँ पेस्ट करें) -->
-    <!-- <meta name="google-site-verification" content="YOUR_CODE_HERE" /> -->
-
-    <!-- 6. WhatsApp या Social Media पर लिंक शेयर करने पर दिखने वाला कार्ड (Open Graph) -->
     <meta property="og:title" content="Study 9 - Free Education by Danish">
     <meta property="og:description" content="Get free Class 9 video lectures, PDFs, and coding tutorials by Danish.">
     <meta property="og:image" content="https://danish-1618.github.io/Study-9/logo.jpg">
     <meta property="og:url" content="https://danish-1618.github.io/Study-9/">
     <meta property="og:type" content="website">
-
-    <!-- Favicon (ब्राउज़र के टैब में दिखने वाला आइकॉन) -->
     <link rel="icon" href="logo.jpg" type="image/jpeg">
-    
-    <!-- आपकी मौजूदा CSS और Manifest फाइल (यहाँ अपने CSS फाइल का असली नाम लिखें) -->
     <link rel="stylesheet" href="style.css"> 
 </head>
 
 <body>
-    <!-- Main Navigation Bar -->
     <nav class="navbar">
         <img class="logo" src="logo.jpg" alt="website logo" height="45">
-        <h1 class="logo-title">
-            <i>Study</i><span class="highlight" ><i>9</i></span>
-        </h1>
+        <h1 class="logo-title"><i>Study</i><span class="highlight"><i>9</i></span></h1>
         <input class="searchbar" id="searchInput" type="search" placeholder="Dive into the Knowledge" />
     </nav>
 
-    <!-- Tabs Navigation Bar -->
     <nav id="tags" class="navbar">
         <div id="tabs" class="tabs">
             <div class="list" id="home" data-title="hometab">Home</div>
             <div class="list" id="videotab" data-title="videotab">Videos</div>
             <div class="list" id="shorts" data-title="Shorts">Shorts</div>
-            <div class="list" id="code-area" data-title="code-area"><a href="Neux_AI.html">Ask AI</a></div>
-            <div class="list" id="myYT-channel"><a href="https://www.youtube.com/@Math_1.618">My Channel</a>
-                
-            </div>
+            <div class="list" id="code-area" data-title="code-area"><a href="code-editor.html">Code Lab</a></div>
+            <div class="list" id="ai-area" data-title="ask-ai"><a href="Neux_AI.html">Ask AI</a></div>
+            <div class="list" id="myYT-channel"><a href="https://www.youtube.com/@Math_1.618">My Channel</a></div>
         </div>
     </nav>
 
     <hr style="border: 1px solid #005CB9; width: 100%; margin: 0;">
-    <div class="intro">
-        <p class="introduction" ><big>Hello i am Mu.Danish</big></p>
-    </div>
+    <div class="intro"><p class="introduction"><big>Hello i am Mu.Danish</big></p></div>
     
     <div class="main-pdfG">
-        <!-- PDF Gallery Section -->
         <div class="pdf-gallery">
-            <!-- 1st item (PDF Document) -->
             <div class="pdf" data-title="Class 9 hindi | Hindi Chapter 1 | chapter 2 | (हिंदी पाठ - 1) Hindi full note | hindi full pdf | hindi full pdf part 1 | part 1 | pdf | PDF">
-                <h3 class="vid-title">Class 9 | Hindi Full Chapterwise pdf |  हिंदी</h3>
+                <h3 class="vid-title">Class 9 | Hindi Full Chapterwise pdf | हिंदी</h3>
                 <div class="pdf-card">
                     <a href="HindiFull.pdf" target="_blank" class="pdf-link">
-                        <!-- PDF का थंबनेल / पोस्टर -->
                         <img class="poster-img" src="hindiPDF-Thumbnail.jpg" alt="Hindi full Chapters PDF Thumbnail">
-                    
-                        <!-- PDF का आइकॉन या ओपन बैज -->
                         <div class="pdf-badge">📄 Open PDF</div>
-                      
                     </a>
- 
                 </div>
             </div>
-
         </div>
     </div>
     
-    <!-- Video Gallery Section -->
     <div class="video-gallery">
-        
-              <div class="video" data-title="Class 9 maths | mathematics chapter 3 | co-ordinate geometry | trignomentry and nirdeshank | chapter 3">
+        <div class="video" data-title="Class 9 maths | mathematics chapter 3 | co-ordinate geometry | trignomentry and nirdeshank | chapter 3">
             <h3 class="vid-title">Maths by Danish | co-ordinate geometry and Tringnomentry | chapter 3</h3>
-            <div class="vid-frame" onclick="playVideo(this)">
-              <img class="poster-img" src="https://img.youtube.com/vi/1p9hO9_37Cg/hqdefault.jpg" alt="Poster">
-                <div class="play-btn">▶</div>
-                <iframe class="my-iframe" data-src="https://www.youtube.com/embed/1p9hO9_37Cg?modestbranding=1&rel=0&autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-            </div>
-         </div>
-
-         <div class="video" data-title="Class 9 Maths Chapter 3 | mathematics chapter 3 | co-ordinate geometry part 1| nirdeshank jyamiti | part 1 | chapter 3">
-          <h3 class="vid-title">Class 9 Maths Chapter 3 by Danish | nirdeshank jyamiti (co-ordinate geometry) | Part 1</h3>
-          <div class="vid-frame" onclick="playVideo(this)">
-              <img class="poster-img" src="https://img.youtube.com/vi/fxAX5Yb-3gY/hqdefault.jpg" alt="Poster">
-          <div class="play-btn">▶</div>
-          <iframe class="my-iframe" data-src="https://www.youtube.com/embed/fxAX5Yb-3gY?modestbranding=1&rel=0&autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-          </div>
+            <div class="vid-frame" onclick="playVideo(this)"><img class="poster-img" src="https://img.youtube.com/vi/1p9hO9_37Cg/hqdefault.jpg" alt="Poster"><div class="play-btn">▶</div><iframe class="my-iframe" data-src="https://www.youtube.com/embed/1p9hO9_37Cg?modestbranding=1&rel=0&autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>
         </div>
-
-        <!-- Fifth video (J.A.R.V.I.S) -->
+        <div class="video" data-title="Class 9 Maths Chapter 3 | mathematics chapter 3 | co-ordinate geometry part 1| nirdeshank jyamiti | part 1 | chapter 3">
+            <h3 class="vid-title">Class 9 Maths Chapter 3 by Danish | nirdeshank jyamiti (co-ordinate geometry) | Part 1</h3>
+            <div class="vid-frame" onclick="playVideo(this)"><img class="poster-img" src="https://img.youtube.com/vi/fxAX5Yb-3gY/hqdefault.jpg" alt="Poster"><div class="play-btn">▶</div><iframe class="my-iframe" data-src="https://www.youtube.com/embed/fxAX5Yb-3gY?modestbranding=1&rel=0&autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>
+        </div>
         <div class="video" data-title="J.A.R.V.I.S-OpenAI + Python Powered Destop assistant | coding | Custom AI assistant | python | CodeWithharry | Code with harry">
             <h3 class="vid-title">J.A.R.V.I.S-OpenAI + Python Powered Destop assistant | custom AI assistant</h3>
-            <div class="vid-frame" onclick="playVideo(this)">
-                <img class="poster-img" src="https://img.youtube.com/vi/s_8b5iq4Rvk/hqdefault.jpg" alt="Poster">
-                <div class="play-btn">▶</div>
-                <iframe class="my-iframe" data-src="https://www.youtube.com/embed/s_8b5iq4Rvk?modestbranding=1&rel=0&autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
+            <div class="vid-frame" onclick="playVideo(this)"><img class="poster-img" src="https://img.youtube.com/vi/s_8b5iq4Rvk/hqdefault.jpg" alt="Poster"><div class="play-btn">▶</div><iframe class="my-iframe" data-src="https://www.youtube.com/embed/s_8b5iq4Rvk?modestbranding=1&rel=0&autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
         </div>
-        
-        <!-- Pehla video -->
-        <div class="video" data-title="Class 9 Science Chapter 5 | biology chapter 1 | cell part 1 |  cell koshika | chapter 5">
+        <div class="video" data-title="Class 9 Science Chapter 5 | biology chapter 1 | cell part 1 | cell koshika | chapter 5">
             <h3 class="vid-title">Class 9 Science Biology Chapter 1 | Cell part 2 | chapter 5</h3>
-            <div class="vid-frame" onclick="playVideo(this)">
-                <img class="poster-img" src="https://img.youtube.com/vi/CQPFCFYTSNE/hqdefault.jpg" alt="Poster">
-                <div class="play-btn">▶</div>
-                <iframe class="my-iframe" data-src="https://www.youtube.com/embed/CQPFCFYTSNE?modestbranding=1&rel=0&autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
+            <div class="vid-frame" onclick="playVideo(this)"><img class="poster-img" src="https://img.youtube.com/vi/CQPFCFYTSNE/hqdefault.jpg" alt="Poster"><div class="play-btn">▶</div><iframe class="my-iframe" data-src="https://www.youtube.com/embed/CQPFCFYTSNE?modestbranding=1&rel=0&autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
         </div>
-
-        <!-- Dusra video -->
-        <div class="video" data-title="Class 9 Science Chapter 5 | biology chapter 1 | cell part 2 |  cell koshika | chapter 5">
+        <div class="video" data-title="Class 9 Science Chapter 5 | biology chapter 1 | cell part 2 | cell koshika | chapter 5">
             <h3 class="vid-title">Class 9 Science Biology Chapter 1 | Cell part 1 | chapter 5</h3>
-            <div class="vid-frame" onclick="playVideo(this)">
-                <img class="poster-img" src="https://img.youtube.com/vi/XebUIVfQC3o/hqdefault.jpg" alt="Poster">
-                <div class="play-btn">▶</div>
-                <iframe class="my-iframe" data-src="https://www.youtube.com/embed/XebUIVfQC3o?modestbranding=1&rel=0&autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
+            <div class="vid-frame" onclick="playVideo(this)"><img class="poster-img" src="https://img.youtube.com/vi/XebUIVfQC3o/hqdefault.jpg" alt="Poster"><div class="play-btn">▶</div><iframe class="my-iframe" data-src="https://www.youtube.com/embed/XebUIVfQC3o?modestbranding=1&rel=0&autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
         </div>
-        
-        <!-- Teesra video -->
         <div class="video" data-title="Class 9 history Chapter 1 | history chapter 1 | phranshisi kranti oneshot | franshisi kranti | chapter 1">
             <h3 class="vid-title">Class 9 History Chapter 1 | Phranshisi kranti oneshot | chapter 1</h3>
-            <div class="vid-frame" onclick="playVideo(this)">
-                <img class="poster-img" src="https://img.youtube.com/vi/a2rYUh5KOf0/hqdefault.jpg" alt="Poster">
-                <div class="play-btn">▶</div>
-                <iframe class="my-iframe" data-src="https://www.youtube.com/embed/a2rYUh5KOf0?modestbranding=1&rel=0&autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-        </div>      
-        
-        <!-- Forth video -->
+            <div class="vid-frame" onclick="playVideo(this)"><img class="poster-img" src="https://img.youtube.com/vi/a2rYUh5KOf0/hqdefault.jpg" alt="Poster"><div class="play-btn">▶</div><iframe class="my-iframe" data-src="https://www.youtube.com/embed/a2rYUh5KOf0?modestbranding=1&rel=0&autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+        </div>
         <div class="video" data-title="Codeing with Danish CSS animation | Coding | css code | CSS">
             <h3 class="vid-title">Coding with Danish | CSS animation</h3>
-            <div class="vid-frame" onclick="playVideo(this)">
-                <img class="poster-img" src="https://img.youtube.com/vi/ZT2o4h6tTyo/hqdefault.jpg" alt="Poster">
-                <div class="play-btn">▶</div>
-                <iframe class="my-iframe" data-src="https://www.youtube.com/embed/ZT2o4h6tTyo?modestbranding=1&rel=0&autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
+            <div class="vid-frame" onclick="playVideo(this)"><img class="poster-img" src="https://img.youtube.com/vi/ZT2o4h6tTyo/hqdefault.jpg" alt="Poster"><div class="play-btn">▶</div><iframe class="my-iframe" data-src="https://www.youtube.com/embed/ZT2o4h6tTyo?modestbranding=1&rel=0&autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
         </div>
-
     </div>
 
     <script src="script.js"></script>
     <script src="https://keepandroidopen.org/banner.js?link=https://example.com/android&hidebutton=off"></script>
 </body>
-
 </html>
