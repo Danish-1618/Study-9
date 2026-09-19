@@ -10,42 +10,49 @@ const pdfs = document.querySelectorAll('.pdf');
 const videoGallery = document.querySelector('.video-gallery');
 const pdfGallery = document.querySelector('.pdf-gallery');
 
-// Keep the homepage navigation usable on narrow screens and make every item a real link.
 const tabs = document.getElementById('tabs');
 if (tabs) {
-  const navLinks = {
-    home: 'index.html',
-    videotab: '#videos',
-    shorts: '#shorts',
-    'code-area': 'code-editor.html',
-    'ai-area': 'Neux_AI.html',
-    'myYT-channel': 'https://www.youtube.com/@Math_1.618'
-  };
-  Object.entries(navLinks).forEach(([id, href]) => {
-    const item = document.getElementById(id);
-    if (!item || item.querySelector('a')) return;
+  const navigation = [
+    ['home', 'Home', 'index.html'],
+    ['videotab', 'Videos', '#videos'],
+    ['shorts', 'Shorts', '#shorts'],
+    ['calculator-tab', 'Omni Calc', 'omni-calculator.html'],
+    ['code-area', 'Code Lab', 'code-editor.html'],
+    ['ai-area', 'Ask AI', 'Neux_AI.html'],
+    ['myYT-channel', 'My Channel', 'https://www.youtube.com/@Math_1.618']
+  ];
+
+  // Rebuild the nav in the requested order so Omni Calc sits between Shorts and Code Lab.
+  tabs.replaceChildren();
+  navigation.forEach(([id, label, href]) => {
+    const item = document.createElement('div');
+    item.className = 'list';
+    item.id = id;
+    item.dataset.title = label.toLowerCase().replace(/\s+/g, '-');
+
     const link = document.createElement('a');
     link.href = href;
-    link.textContent = item.textContent.trim();
+    link.textContent = label;
     if (href.startsWith('http')) {
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
     }
-    item.textContent = '';
     item.appendChild(link);
+    tabs.appendChild(item);
   });
 
-  // Add the calculator to the homepage without disturbing existing cards.
-  if (!document.getElementById('omni-calculator-card') && pdfGallery) {
-    const card = document.createElement('div');
-    card.id = 'omni-calculator-card';
-    card.className = 'pdf calculator-card';
-    card.dataset.title = 'omni calculator scientific calculator graph latex math';
-    card.innerHTML = '<h3 class="vid-title">OmniCalc | Scientific Calculator & Graphs</h3>' +
-      '<p>Calculate, graph functions, and render LaTeX beautifully.</p>' +
-      '<a class="calculator-link" href="omni-calculator.html">Open OmniCalc →</a>';
-    pdfGallery.appendChild(card);
-  }
+  // Horizontal scrolling keeps every navigation item reachable on phone screens.
+  const navStyle = document.createElement('style');
+  navStyle.textContent = `
+    #tags { overflow: hidden; }
+    #tags #tabs { width: 100%; justify-content: flex-start; gap: 0; overflow-x: auto; overflow-y: hidden; flex-wrap: nowrap; scrollbar-width: thin; -webkit-overflow-scrolling: touch; touch-action: pan-x; }
+    #tags #tabs::-webkit-scrollbar { height: 6px; }
+    #tags #tabs::-webkit-scrollbar-thumb { background: #8aaed0; border-radius: 20px; }
+    #tags #tabs .list { flex: 0 0 auto; white-space: nowrap; padding: 8px 14px; }
+    #tags #tabs a { color: inherit; text-decoration: none; display: block; }
+    @media (max-width: 600px) { #tags #tabs { justify-content: flex-start; } #tags #tabs .list { padding: 9px 15px; } }
+  `;
+  document.head.appendChild(navStyle);
 }
 
 const resultCount = document.createElement('div');
