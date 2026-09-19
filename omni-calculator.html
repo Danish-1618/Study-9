@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OmniCalc — Scientific Calculator & Grapher</title>
+
+<!-- KaTeX : beautiful LaTeX rendering -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<!-- math.js : full math engine (units, matrices, complex, symbolic) -->
+<script defer src="https://cdn.jsdelivr.net/npm/mathjs@14.2.1/lib/browser/math.min.js"></script>
+
+<style>
+  /* ============ RESET & THEME ============ */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg1: #0b0e2a; --bg2: #26246b; --bg3: #131633;
+    --glass: rgba(255,255,255,0.06);
+    --glass-brd: rgba(255,255,255,0.13);
+    --txt: #f2f4ff; --txt-dim: rgba(242,244,255,0.55);
+    --accent: #7c5cff; --accent2: #00e5ff;
+    --accent-glow: rgba(124,92,255,0.5);
+    --key: rgba(255,255,255,0.08);
+    --key-hi: rgba(255,255,255,0.18);
+    --danger: #ff5c7c; --ok: #3ddc97;
+    --eq-grad: linear-gradient(135deg,#7c5cff,#00e5ff);
+    --disp-bg: rgba(0,0,0,0.28);
+    --panel-bg: rgba(9,10,30,0.72);
+    --ripple: rgba(255,255,255,0.4);
+    --grid-line: rgba(255,255,255,0.07);
+    --grid-axis: rgba(255,255,255,0.35);
+  }
+  body.light {
+    --bg1:#dfe7ff; --bg2:#c9d6ff; --bg3:#efe9ff;
+    --glass: rgba(255,255,255,0.55);
+    --glass-brd: rgba(70,60,160,0.16);
+    --txt:#1b1838; --txt-dim: rgba(27,24,56,0.55);
+    --key: rgba(110,95,220,0.10); --key-hi: rgba(110,95,220,0.22);
+    --disp-bg: rgba(255,255,255,0.5);
+    --panel-bg: rgba(255,255,255,0.9);
+    --ripple: rgba(124,92,255,0.35);
+    --grid-line: rgba(30,30,80,0.10);
+    --grid-axis: rgba(30,30,80,0.45);
+  }
+
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    display: grid; place-items: center;
+    color: var(--txt);
+    background: linear-gradient(-45deg,var(--bg1),var(--bg2),var(--bg3),var(--bg2));
+    background-size: 400% 400%;
+    animation: bgShift 18s ease infinite;
+    overflow-x: hidden;
+    transition: color .4s;
+    padding: 24px 14px;
+  }
+  @keyframes bgShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+
+  .orb { position: fixed; border-radius: 50%; filter: blur(80px); opacity:.45; pointer-events:none; z-index:0; animation: floatOrb 22s ease-in-out infinite alternate; }
+  .orb:nth-of-type(1){ width:360px;height:360px;background:#7c5cff;top:-100px;left:-100px; }
+  .orb:nth-of-type(2){ width:320px;height:320px;background:#00e5ff;bottom:-90px;right:-80px;animation-delay:-8s; }
+  .orb:nth-of-type(3){ width:230px;height:230px;background:#ff5c7c;top:55%;left:12%;opacity:.28;animation-delay:-14s; }
+  @keyframes floatOrb { from{transform:translate(0,0) scale(1)} to{transform:translate(60px,-55px) scale(1.18)} }
+
+  /* ============ SHELL ============ */
+  .app {
+    position: relative; z-index: 1;
+    width: min(960px, 100%);
+    background: var(--glass);
+    border: 1px solid var(--glass-brd);
+    border-radius: 26px;
+    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    box-shadow: 0 30px 70px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.09);
+    overflow: hidden;
+    animation: cardIn .8s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes cardIn { from{opacity:0;transform:translateY(36px) scale(.95)} to{opacity:1;transform:none} }
+
+  /* ============ HEADER / TABS ============ */
+  header {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px 20px; border-bottom: 1px solid var(--glass-brd);
+  }
+  .brand { display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.4px; }
+  .brand .logo {
+    width:38px;height:38px;display:grid;place-items:center;border-radius:11px;
+    background: var(--eq-grad); font-size:19px; color:#fff;
+    box-shadow: 0 4px 16px var(--accent-glow);
+    animation: logoPulse 3.2s ease-in-out infinite;
+  }
+  @keyframes logoPulse { 0%,100%{box-shadow:0 4px 16px var(--accent-glow)} 50%{box-shadow:0 4px 30px var(--accent2)} }
+  .brand small { display:block; font-size:10px; font-weight:500; color:var(--txt-dim); letter-spacing:1.5px; }
+
+  .tabs { display:flex; position:relative; margin-left:auto; padding:4px; border-radius:999px; background:var(--key); border:1px solid var(--glass-brd); }
+  .tabs button {
+    all:unset; cursor:pointer; position:relative; z-index:1;
+    font-size:12.5px; font-weight:700; padding:7px 18px; border-radius:999px;
+    color:var(--txt-dim); transition: color .25s;
+  }
+  .tabs button.active { color:#fff; }
+  .tabs .tab-slider {
+    position:absolute; top:4px; bottom:4px; border-radius:999px;
+    background: var(--eq-grad); box-shadow:0 2px 12px var(--accent-glow);
+    transition: left .35s cubic-bezier(.22,1,.36,1), width .35s cubic-bezier(.22,1,.36,1);
+  }
+
+  .icon-btn {
+    all:unset; cursor:pointer; width:36px;height:36px; display:grid;place-items:center;
+    border-radius:10px; background:var(--key); border:1px solid var(--glass-brd);
+    font-size:15px; transition: background .2s, transform .15s;
+  }
+  .icon-btn:hover{ background:var(--key-hi); transform:translateY(-2px); }
+  .icon-btn:active{ transform:scale(.92); }
+
+  /* ============ VIEWS ============ */
+  .view { display:none; padding: 18px 20px 22px; }
+  .view.active { display:block; animation: viewIn .45s cubic-bezier(.22,1,.36,1) both; }
+  @keyframes viewIn { from{opacity:0; transform:translateY(14px)} to{opacity:1; transform:none} }
+
+  /* ============ CALCULATOR ============ */
+  .calc-grid { display:grid; grid-template-columns: 1fr; gap:14px; }
+
+  .display {
+    background: var(--disp-bg); border:1px solid var(--glass-brd); border-radius:18px;
+    min-height:130px; padding:18px 20px 16px;
+    display:flex; flex-direction:column; justify-content:center; gap:10px;
+    position:relative; overflow:hidden;
+  }
+  .display .expr { min-height:34px; font-size:19px; overflow-x:auto; scrollbar-width:none; text-align:right; }
+  .display .expr::-webkit-scrollbar{display:none}
+  .display .result { font-size:26px; overflow-x:auto; scrollbar-width:none; text-align:right; color:var(--txt); transition: color .3s; }
+  .display .result::-webkit-scrollbar{display:none}
+  .display .result.preview { color: var(--txt-dim); }
+  .display .result .eq-sign { color: var(--accent2); margin-right:8px; font-weight:300; }
+  .display .result.pop { animation: popIn .3s cubic-bezier(.34,1.56,.64,1); }
+  .display .result.flash { animation: eqFlash .6s ease; }
+  .display .result.err { color: var(--danger); animation: shake .4s ease; }
+  @keyframes popIn { 0%{transform:scale(.86);opacity:.4} 100%{transform:scale(1);opacity:1} }
+  @keyframes eqFlash { 0%{text-shadow:0 0 0 transparent} 30%{text-shadow:0 0 22px var(--accent2),0 0 55px var(--accent-glow)} 100%{text-shadow:0 0 0 transparent} }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px)} 50%{transform:translateX(7px)} 75%{transform:translateX(-4px)} }
+  .badge-row { position:absolute; top:10px; left:14px; display:flex; gap:6px; }
+  .badge { font-size:9.5px; font-weight:800; letter-spacing:1.2px; color:var(--accent2); opacity:0; transition:opacity .3s; }
+  .badge.show { opacity:1; }
+
+  .input-row { display:flex; gap:10px; }
+  .input-wrap { flex:1; position:relative; }
+  #mathInput {
+    width:100%; padding:14px 16px; font-size:16.5px; color:var(--txt);
+    background: var(--key); border:1px solid var(--glass-brd); border-radius:14px;
+    outline:none; font-family:"Cambria Math","Segoe UI",serif;
+    transition: border-color .25s, box-shadow .25s;
+  }
+  #mathInput:focus { border-color: var(--accent); box-shadow:0 0 0 3px var(--accent-glow); }
+  #mathInput::placeholder { color: var(--txt-dim); }
+
+  .btn {
+    all:unset; cursor:pointer; text-align:center; border-radius:14px;
+    background: var(--eq-grad); color:#fff; font-weight:700; font-size:15px;
+    padding:0 22px; display:grid; place-items:center;
+    box-shadow: 0 6px 18px var(--accent-glow);
+    transition: transform .15s, box-shadow .2s, filter .2s;
+    position:relative; overflow:hidden;
+  }
+  .btn:hover{ transform:translateY(-2px); box-shadow:0 10px 26px var(--accent2); filter:brightness(1.08); }
+  .btn:active{ transform:scale(.95); }
+
+  .chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .chip {
+    all:unset; cursor:pointer; font-size:11.5px; font-weight:600;
+    padding:5px 12px; border-radius:999px;
+    background:var(--key); border:1px solid var(--glass-brd); color:var(--txt-dim);
+    transition: all .2s; position:relative; overflow:hidden;
+  }
+  .chip:hover{ color:var(--txt); background:var(--key-hi); transform:translateY(-1px); border-color:var(--accent); }
+
+  .keypad { display:grid; grid-template-columns:repeat(10,1fr); gap:7px; }
+  .keypad button.key {
+    all:unset; cursor:pointer; text-align:center; padding:10px 0; border-radius:11px;
+    background:var(--key); border:1px solid var(--glass-brd); color:var(--txt);
+    font-size:14px; font-weight:600; font-family:"Cambria Math","Segoe UI",serif;
+    position:relative; overflow:hidden;
+    transition: background .18s, transform .12s, box-shadow .18s, color .18s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .keypad button.key:hover{ background:var(--key-hi); transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,.3); }
+  .keypad button.key:active{ transform:scale(.9); }
+  .keypad button.key.wide{ grid-column: span 2; }
+  .keypad button.key.fn{ color: var(--accent2); font-size:13px; }
+  .keypad button.key.warn{ color: var(--danger); }
+
+  .ripple{ position:absolute; border-radius:50%; background:var(--ripple); transform:scale(0); animation:rippleGo .55s ease-out forwards; pointer-events:none; }
+  @keyframes rippleGo{ to{transform:scale(3.2);opacity:0} }
+
+  .section-label { font-size:10.5px; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--txt-dim); margin:4px 2px 2px; }
+
+  /* history */
+  .history-wrap { margin-top:4px; }
+  .history-list { display:flex; flex-direction:column; gap:7px; max-height:210px; overflow-y:auto; scrollbar-width:thin; padding-right:4px; }
+  .hist-item {
+    display:flex; justify-content:space-between; align-items:center; gap:14px;
+    padding:10px 14px; border-radius:12px; background:var(--key);
+    border:1px solid transparent; cursor:pointer;
+    transition: border-color .2s, transform .15s;
+    animation: histIn .35s ease both;
+  }
+  @keyframes histIn{ from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+  .hist-item:hover{ border-color:var(--accent); transform:translateX(4px); }
+  .hist-item .h-l{ font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .hist-item .h-r{ font-size:14px; color:var(--accent2); font-weight:700; white-space:nowrap; }
+  .hist-empty{ text-align:center; color:var(--txt-dim); font-size:13px; padding:18px; }
+
+  /* ============ GRAPH ============ */
+  .graph-grid { display:grid; grid-template-columns: 300px 1fr; gap:16px; align-items:start; }
+
+  .fn-panel { display:flex; flex-direction:column; gap:10px; }
+  .fn-list { display:flex; flex-direction:column; gap:8px; }
+  .fn-item {
+    display:flex; align-items:center; gap:8px;
+    background:var(--key); border:1px solid var(--glass-brd); border-radius:12px;
+    padding:7px 10px; animation: histIn .3s ease both;
+    transition: border-color .2s, opacity .3s;
+  }
+  .fn-item.hidden-fn{ opacity:.42; }
+  .fn-item.err{ border-color: var(--danger); }
+  .fn-dot{ width:13px;height:13px;border-radius:50%;cursor:pointer;flex:none; box-shadow:0 0 10px currentColor; animation: dotGlow 2.4s ease-in-out infinite; }
+  @keyframes dotGlow{ 0%,100%{filter:brightness(1)} 50%{filter:brightness(1.5)} }
+  .fn-item input{
+    flex:1; min-width:0; background:transparent; border:none; outline:none;
+    color:var(--txt); font-size:14px; font-family:"Cambria Math","Segoe UI",serif;
+  }
+  .fn-del{ all:unset; cursor:pointer; color:var(--txt-dim); font-size:15px; padding:2px 6px; border-radius:7px; transition:all .2s; flex:none; }
+  .fn-del:hover{ color:var(--danger); background:rgba(255,92,124,.12); }
+
+  .graph-tools { display:flex; flex-wrap:wrap; gap:7px; }
+  .tool {
+    all:unset; cursor:pointer; font-size:11.5px; font-weight:700;
+    padding:6px 11px; border-radius:9px; background:var(--key);
+    border:1px solid var(--glass-brd); color:var(--txt-dim);
+    transition:all .2s; position:relative; overflow:hidden;
+  }
+  .tool:hover{ color:var(--txt); background:var(--key-hi); border-color:var(--accent); transform:translateY(-1px); }
+  .tool.on{ background:var(--eq-grad); color:#fff; border-color:transparent; box-shadow:0 4px 14px var(--accent-glow); }
+
+  .plot-wrap { position:relative; border-radius:18px; overflow:hidden; border:1px solid var(--glass-brd); background:var(--disp-bg); }
+  #plotCanvas { display:block; width:100%; height:520px; cursor:crosshair; touch-action:none; }
+  .plot-readout {
+    position:absolute; top:10px; left:12px; font-size:11px; font-weight:600;
+    color:var(--txt-dim); pointer-events:none; line-height:1.7;
+    background:rgba(0,0,0,.25); padding:6px 10px; border-radius:8px; backdrop-filter:blur(4px);
+  }
+  body.light .plot-readout{ background:rgba(255,255,255,.4); }
+  .plot-hint {
+    position:absolute; bottom:10px; right:12px; font-size:10.5px;
+    color:var(--txt-dim); pointer-events:none; text-align:right; line-height:1.6;
+  }
+  .analysis-box { margin-top:10px; font-size:12.5px; line-height:1.9; max-height:130px; overflow-y:auto; scrollbar-width:thin; }
+  .analysis-box .a-tag{ font-weight:800; margin-right:6px; }
+  .analysis-box .a-root{ color:var(--danger); font-weight:700; }
+  .analysis-box .a-ext{ color:var(--ok); font-weight:700; }
+
+  @media (max-width: 860px){
+    .graph-grid{ grid-template-columns:1fr; }
+    #plotCanvas{ height:380px; }
+    .keypad{ grid-template-columns:repeat(6,1fr); }
+    .tabs{ margin-left:auto; }
+    .brand small{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="orb"></div><div class="orb"></div><div class="orb"></div>
+
+<div class="app">
+
+  <!-- ================= HEADER ================= -->
+  <header>
+    <div class="brand">
+      <span class="logo">∑</span>
+      <div>OmniCalc<small>LATEX &nbsp;·&nbsp; GRAPHS &nbsp;·&nbsp; CAS</small></div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <div class="tab-slider" id="tabSlider"></div>
+      <button data-view="calc" class="active">Calculator</button>
+      <button data-view="graph">Graphs</button>
+    </nav>
+    <button class="icon-btn" id="themeBtn" title="Toggle theme">☾</button>
+  </header>
+
+  <!-- ================= CALCULATOR VIEW ================= -->
+  <section class="view active" id="view-calc">
+    <div class="calc-grid">
+
+      <div class="display">
+        <div class="badge-row">
+          <span class="badge" id="angleBadge">DEG</span>
+        </div>
+        <div class="expr" id="exprView"></div>
+        <div class="result preview" id="resView"><span class="eq-sign">=</span>0</div>
+      </div>
+
+      <div class="input-row">
+        <div class="input-wrap">
+          <input id="mathInput" spellcheck="false" autocomplete="off"
+                 placeholder='Type math or LaTeX — e.g.  \frac{sin(x)}{x^2},  5 km to miles,  [1,2;3,4]·[5;6]' />
+        </div>
+        <button class="btn" id="evalBtn" title="Evaluate (Enter)">=</button>
+      </div>
+
+      <div class="chips" id="smartChips">
+        <button class="chip" data-op="simplify">✨ Simplify</button>
+        <button class="chip" data-op="derive">∂/∂x Differentiate</button>
+        <button class="chip" data-op="graphit">📈 Graph f(x)</button>
+        <button class="chip" data-op="deg">DEG trig</button>
+        <button class="chip" data-op="rad">RAD trig</button>
+        <button class="chip" data-ex="\frac{1}{2}+\sqrt{16}">ex: ½+√16</button>
+        <button class="chip" data-ex="2\pi + e^{2}">ex: 2π+e²</button>
+        <button class="chip" data-ex="5 kg \cdot 9.81 m/s^2 to lbf">ex: units</button>
+        <button class="chip" data-ex="[1,2;3,4] \cdot [5;6]">ex: matrix</button>
+        <button class="chip" data-ex="sqrt(-1)^2 + (3+4i)(1-2i)">ex: complex</button>
+      </div>
+
+      <div class="section-label">Keys — insert LaTeX at cursor</div>
+      <div class="keypad" id="keypad">
+        <button class="key" data-ins="7">7</button><button class="key" data-ins="8">8</button><button class="key" data-ins="9">9</button>
+        <button class="key" data-ins="(">(</button><button class="key" data-ins=")">)</button>
+        <button class="key fn" data-latex="\frac{}{}" data-caret="3">a/b</button>
+        <button class="key fn" data-latex="\sqrt{}" data-caret="1">√x</button>
+        <button class="key fn" data-latex="^{}" data-caret="1">xⁿ</button>
+        <button class="key fn" data-latex="\left|\right|" data-caret="7">|x|</button>
+
+        <button class="key" data-ins="4">4</button><button class="key" data-ins="5">5</button><button class="key" data-ins="6">6</button>
+        <button class="key" data-ins="+">+</button><button class="key" data-ins="-">−</button>
+        <button class="key fn" data-latex="\pi">π</button>
+        <button class="key fn" data-latex="e">e</button>
+        <button class="key fn" data-ins="!">n!</button>
+        <button class="key fn" data-ins="%">%</button>
+
+        <button class="key" data-ins="1">1</button><button class="key" data-ins="2">2</button><button class="key" data-ins="3">3</button>
+        <button class="key" data-ins="*">×</button><button class="key" data-ins="/">÷</button>
+        <button class="key fn" data-latex="\ln{}" data-caret="1">ln</button>
+        <button class="key fn" data-latex="\log{}" data-caret="1">log</button>
+        <button class="key fn" data-latex="\sin{}" data-caret="1">sin</button>
+        <button class="key fn" data-latex="\cos{}" data-caret="1">cos</button>
+
+        <button class="key" data-ins="0">0</button><button class="key" data-ins=".">.</button>
+        <button class="key" data-ins=",">,</button><button class="key" data-ins="^">^</button>
+        <button class="key warn" data-act="clear">AC</button>
+        <button class="key fn" data-latex="\tan{}" data-caret="1">tan</button>
+        <button class="key fn" data-latex="e^{}" data-caret="1">eˣ</button>
+        <button class="key fn" data-latex="\sqrt[3]{}" data-caret="1">∛x</button>
+        <button class="key fn" data-latex="\infty">∞</button>
+      </div>
+
+      <div class="section-label">History — click to reuse</div>
+      <div class="history-wrap">
+        <div class="history-list" id="historyList">
+          <div class="hist-empty">Your calculations will appear here…</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= GRAPH VIEW ================= -->
+  <section class="view" id="view-graph">
+    <div class="graph-grid">
+
+      <div class="fn-panel">
+        <div class="section-label">Functions of x — LaTeX or plain</div>
+        <div class="fn-list" id="fnList"></div>
+        <button class="chip" id="addFnBtn" style="text-align:center; padding:9px;">+ Add function</button>
+
+        <div class="section-label">Presets</div>
+        <div class="chips">
+          <button class="chip" data-fn="\sin(x)/x">sin(x)/x</button>
+          <button class="chip" data-fn="x^3-3x">x³−3x</button>
+          <button class="chip" data-fn="e^{-x^2}">gaussian</button>
+          <button class="chip" data-fn="\frac{1}{x}">1/x</button>
+          <button class="chip" data-fn="\ln(x)">ln(x)</button>
+          <button class="chip" data-fn="\sin(x)+\cos(3x)">wave mix</button>
+        </div>
+
+        <div class="section-label">Tools</div>
+        <div class="graph-tools">
+          <button class="tool" id="zoomIn">＋ Zoom</button>
+          <button class="tool" id="zoomOut">－ Zoom</button>
+          <button class="tool" id="resetView">⟲ Reset</button>
+          <button class="tool" id="toggleGrid">▦ Grid</button>
+          <button class="tool" id="analyzeBtn">🔍 Roots & extrema</button>
+          <button class="tool" id="pngBtn">⬇ PNG</button>
+        </div>
+
+        <div class="analysis-box" id="analysisBox" hidden></div>
+      </div>
+
+      <div class="plot-wrap">
+        <canvas id="plotCanvas"></canvas>
+        <div class="plot-readout" id="plotReadout"></div>
+        <div class="plot-hint">drag to pan · scroll to zoom · pinch on touch<br>hover to trace values</div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function () {
+"use strict";
+
+/*PURE-START*/
+/* ================================================================
+   LATEX → math.js CONVERTER
+   Best-effort translation of common LaTeX into math.js syntax.
+   ================================================================ */
+function latexToMath(raw) {
+  let s = String(raw == null ? "" : raw);
+  // strip $ delimiters, \left \right fences, spacing macros
+  s = s.replace(/\$\$?/g, "")
+       .replace(/\\left|\\right/g, "")
+       .replace(/\\,|\\;|\\!|\\:|\\quad|\\qquad|~/g, " ")
+       .replace(/\\ /g, " ");
+  // \text{...} → keep inner content (for units like "5 kg")
+  s = s.replace(/\\text\s*\{([^{}]*)\}/g, "$1");
+  // absolute value fences
+  s = s.replace(/\\\|([^|]+)\\\|/g, "abs($1)")
+       .replace(/\|([^|]+)\|/g, "abs($1)");
+  // nth root  \sqrt[n]{x}
+  s = s.replace(/\\sqrt\s*\[([^\[\]]+)\]\s*\{([^{}]*)\}/g, "nthRoot($2, $1)");
+  // \sqrt{x} and \frac{a}{b} — innermost-first loops handle nesting
+  let guard = 0;
+  while (/\\sqrt\s*\{[^{}]*\}/.test(s) && guard++ < 60)
+    s = s.replace(/\\sqrt\s*\{([^{}]*)\}/g, "sqrt($1)");
+  guard = 0;
+  while (/\\frac/.test(s) && guard++ < 60)
+    s = s.replace(/\\frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}/g, "(($1)/($2))");
+  // exponents: ^{...} → ^(...)
+  guard = 0;
+  while (/\^\s*\{[^{}]*\}/.test(s) && guard++ < 60)
+    s = s.replace(/\^\s*\{([^{}]*)\}/g, "^($1)");
+  // named functions, longest-first so \sinh isn't eaten by \sin
+  const FN = {
+    arcsin:"asin", arccos:"acos", arctan:"atan",
+    sinh:"sinh", cosh:"cosh", tanh:"tanh",
+    sec:"sec", csc:"csc", cot:"cot",
+    sin:"sin", cos:"cos", tan:"tan",
+    exp:"exp", ln:"log", log:"log10",
+    abs:"abs", min:"min", max:"max", gcd:"gcd", lcm:"lcm", mod:"mod",
+    asin:"asin", acos:"acos", atan:"atan",
+  };
+  Object.keys(FN).sort((a, b) => b.length - a.length).forEach((k) => {
+    s = s.replace(new RegExp("\\\\" + k + "(?![a-zA-Z])", "g"), FN[k]);
+  });
+  // symbols & operators
+  s = s.replace(/\\times|\\cdot/g, "*")
+       .replace(/\\div/g, "/")
+       .replace(/\\pm/g, "+")
+       .replace(/\\pi(?![a-zA-Z])/g, " pi ")
+       .replace(/\\infty/g, " Infinity ")
+       .replace(/\\e(?![a-zA-Z])/g, " e ")
+       .replace(/\\circ/g, "");
+  // drop subscripts (x_1 → x1 stays a valid-ish token; math.js accepts)
+  s = s.replace(/_\s*\{([^{}]*)\}/g, "_$1");
+  // strip any remaining unknown LaTeX commands
+  s = s.replace(/\\[a-zA-Z]+/g, " ");
+  // leftover braces are plain grouping → parentheses
+  s = s.replace(/\{/g, "(").replace(/\}/g, ")");
+  // unicode pretties
+  s = s.replace(/×/g, "*").replace(/÷/g, "/").replace(/−/g, "-")
+       .replace(/·/g, "*").replace(/π/g, " pi ")
+       .replace(/√/g, "sqrt").replace(/²/g, "^2").replace(/³/g, "^3")
+       .replace(/∞/g, "Infinity").replace(/≈/g, "==");
+  return s.trim();
+}
+
+/* ================================================================
+   GRAPH ANALYSIS — zeros & extrema via sampling + bisection
+   ================================================================ */
+function analyzeFunction(f, x0, x1) {
+  const N = 1600;
+  const roots = [], ext = [];
+  const h = Math.max((x1 - x0) / 1e7, 1e-10);
+  let prevX = x0, prevY = f(x0), prevD = null;
+  const minSep = (x1 - x0) / N;
+  const addRoot = (r) => {
+    if (isFinite(r) && (!roots.length || Math.abs(r - roots[roots.length - 1]) > minSep)) roots.push(r);
+  };
+  const addExt = (x, type) => {
+    if (isFinite(x) && (!ext.length || Math.abs(x - ext[ext.length - 1].x) > minSep))
+      ext.push({ x: x, y: f(x), type: type });
+  };
+  if (prevY === 0) addRoot(x0);
+  for (let i = 1; i <= N; i++) {
+    const xi = x0 + ((x1 - x0) * i) / N;
+    const yi = f(xi);
+    if (prevY === 0) addRoot(prevX);
+    else if (isFinite(prevY) && isFinite(yi) && prevY * yi < 0) {
+      let a = prevX, b = xi, fa = prevY;
+      for (let k = 0; k < 60; k++) {
+        const c = (a + b) / 2, fc = f(c);
+        if (fa * fc <= 0) b = c; else { a = c; fa = fc; }
+      }
+      addRoot((a + b) / 2);
+    }
+    const di = (f(xi + h) - f(xi - h)) / (2 * h);
+    if (prevD === 0 && isFinite(di)) addExt(prevX, di < 0 ? "max" : "min");
+    else if (prevD !== null && isFinite(prevD) && isFinite(di) && prevD * di < 0 && isFinite(yi)) {
+      let a = prevX, b = xi, fdA = prevD;
+      for (let k = 0; k < 50; k++) {
+        const c = (a + b) / 2;
+        const dc = (f(c + h) - f(c - h)) / (2 * h);
+        if (fdA * dc > 0) { a = c; fdA = dc; } else b = c;
+      }
+      addExt((a + b) / 2, prevD > 0 ? "min" : "max");
+    }
+    prevD = isFinite(di) ? di : null;
+    prevX = xi; prevY = yi;
+  }
+  if (f(x1) === 0) addRoot(x1);
+  return { roots, ext };
+}
+
+/* nice axis tick step for a given world-per-pixel scale */
+function niceStep(target) {
+  const p = Math.pow(10, Math.floor(Math.log10(target)));
+  for (const m of [1, 2, 5, 10]) if (m * p >= target) return m * p;
+  return 10 * p;
+}
+
+function fmtTick(v, step) {
+  if (Math.abs(v) < step / 1e6) return "0";
+  const d = Math.max(0, -Math.floor(Math.log10(step)) + 1);
+  return v.toFixed(Math.min(d, 10));
+}
+/*PURE-END*/
+
+/* ================================================================
+   BOOT — wait for deferred libraries
+   ================================================================ */
+function boot() {
+  const KATEX = window.katex, MATH = window.math;
+  if (!MATH) { alert("math.js failed to load — check your internet connection and refresh."); return; }
+
+  const $ = (id) => document.getElementById(id);
+
+  /* ---------- shared helpers ---------- */
+  function renderTex(el, tex, display) {
+    if (!KATEX || !tex) { el.textContent = tex || ""; return; }
+    try {
+      KATEX.render(tex, el, { throwOnError: false, displayMode: !!display });
+    } catch (_) { el.textContent = tex; }
+  }
+  function fmtValue(v) {
+    try { return MATH.format(v, { precision: 12 }); } catch (_) { return String(v); }
+  }
+  function ripple(el, e) {
+    const rect = el.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const r = document.createElement("span");
+    r.className = "ripple";
+    r.style.width = r.style.height = size + "px";
+    const cx = (e && e.clientX != null) ? e.clientX : rect.left + rect.width / 2;
+    const cy = (e && e.clientY != null) ? e.clientY : rect.top + rect.height / 2;
+    r.style.left = (cx - rect.left - size / 2) + "px";
+    r.style.top = (cy - rect.top - size / 2) + "px";
+    el.appendChild(r);
+    setTimeout(() => r.remove(), 560);
+  }
+
+  /* ================================================================
+     TABS
+     ================================================================ */
+  const tabs = $("tabs"), tabSlider = $("tabSlider");
+  function moveTabSlider() {
+    const active = tabs.querySelector("button.active");
+    tabSlider.style.left = active.offsetLeft + "px";
+    tabSlider.style.width = active.offsetWidth + "px";
+  }
+  tabs.querySelectorAll("button").forEach((b) => {
+    b.addEventListener("click", () => {
+      tabs.querySelectorAll("button").forEach((x) => x.classList.remove("active"));
+      b.classList.add("active");
+      document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
+      $("view-" + b.dataset.view).classList.add("active");
+      moveTabSlider();
+      if (b.dataset.view === "graph") resizeCanvas();
+    });
+  });
+
+  /* ================================================================
+     CALCULATOR ENGINE
+     ================================================================ */
+  const input = $("mathInput"), exprView = $("exprView"), resView = $("resView");
+  const angleBadge = $("angleBadge");
+  let angleMode = "deg";   // affects trig in *plain* expressions via unit transform
+  let history = [];
+
+  function setResult(html, cls) {
+    resView.innerHTML = '<span class="eq-sign">=</span>' + html;
+    resView.className = "result " + (cls || "");
+    void resView.offsetWidth; // restart animations
+    if (cls) resView.classList.add(cls);
+  }
+
+  /* DEG-mode trig: override sin/cos/tan in the evaluate scope so sin(30)=0.5 */
+  function degScope() {
+    if (angleMode !== "deg") return {};
+    const d = Math.PI / 180;
+    const wrap = (f) => (x) => f(typeof x === "number" ? x * d : x);
+    return { sin: wrap(Math.sin), cos: wrap(Math.cos), tan: wrap(Math.tan) };
+  }
+
+  /* live preview as you type */
+  let previewTimer = null;
+  function livePreview() {
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(() => {
+      const raw = input.value.trim();
+      renderTex(exprView, raw || "\\;", true);
+      if (!raw) { setResult("0", "preview"); return; }
+      try {
+        const v = MATH.evaluate(latexToMath(raw), degScope());
+        setResult(escapeHtml(fmtValue(v)), "preview pop");
+      } catch (_) { /* keep silent while typing */ }
+    }, 90);
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/[\r\n]+/g, "<br>");
+  }
+
+  /* commit = evaluate, animate, push history */
+  function commit() {
+    const raw = input.value.trim();
+    if (!raw) return;
+    try {
+      const v = MATH.evaluate(latexToMath(raw), degScope());
+      const text = fmtValue(v);
+      setResult(escapeHtml(text), "flash");
+      history.unshift({ input: raw, result: text });
+      if (history.length > 40) history.pop();
+      renderHistory();
+    } catch (err) {
+      setResult(escapeHtml(prettifyError(err)), "err");
+    }
+  }
+
+  function prettifyError(err) {
+    const m = String(err && err.message || err);
+    if (/Undefined symbol|Undefined function/.test(m)) return "Unknown symbol or function";
+    if (/parenthesis|Unexpected end/i.test(m)) return "Unbalanced brackets";
+    if (/Unit mismatch|Units/i.test(m)) return "Unit mismatch";
+    return m.length > 60 ? "Invalid expression" : m;
+  }
+
+  /* smart chips: simplify / derive / graphit / deg / rad */
+  function smartOp(op) {
+    if (op === "deg" || op === "rad") {
+      angleMode = op;
+      angleBadge.textContent = op.toUpperCase();
+      angleBadge.classList.toggle("show", op === "deg");
+      livePreview();
+      return;
+    }
+    if (op === "graphit") return graphCurrent();
+    const raw = input.value.trim();
+    if (!raw) return;
+    try {
+      const expr = latexToMath(raw);
+      const node = op === "simplify" ? MATH.simplify(expr) : MATH.derivative(expr, "x");
+      const text = fmtValue(node);
+      let html;
+      try { html = KATEX.renderToString(node.toTex({ parenthesis: "auto" }), { throwOnError: true }); }
+      catch (_) { html = escapeHtml(text); }
+      setResult(html, "flash");
+      history.unshift({ input: raw, result: text });
+      renderHistory();
+    } catch (err) {
+      setResult(escapeHtml(prettifyError(err)), "err");
+    }
+  }
+
+  /* send the current expression to the graph tab as a new function */
+  function graphCurrent() {
+    const raw = input.value.trim();
+    if (!raw) return;
+    if (functions[functions.length - 1].latex.trim()) {
+      if (functions.length >= 6) functions.shift();
+      functions.push(makeFn(raw));
+    } else {
+      functions[functions.length - 1].latex = raw;
+    }
+    renderFnList(); compileAll();
+    document.querySelector('#tabs button[data-view="graph"]').click();
+  }
+
+  /* keypad: insert plain text or latex snippet at caret */
+  function insertAtCaret(str, caretBack) {
+    const start = input.selectionStart, end = input.selectionEnd;
+    input.value = input.value.slice(0, start) + str + input.value.slice(end);
+    const pos = start + (caretBack != null ? str.length - caretBack : str.length);
+    input.focus();
+    input.setSelectionRange(pos, pos);
+    livePreview();
+  }
+
+  $("keypad").addEventListener("click", (e) => {
+    const btn = e.target.closest("button.key");
+    if (!btn) return;
+    ripple(btn, e);
+    if (btn.dataset.ins) return insertAtCaret(btn.dataset.ins);
+    if (btn.dataset.latex) return insertAtCaret(btn.dataset.latex, Number(btn.dataset.caret || 0));
+    if (btn.dataset.act === "clear") {
+      input.value = "";
+      renderTex(exprView, "\\;", true);
+      setResult("0", "preview");
+      input.focus();
+    }
+  });
+
+  $("smartChips").addEventListener("click", (e) => {
+    const chip = e.target.closest("button.chip");
+    if (!chip) return;
+    ripple(chip, e);
+    if (chip.dataset.op) return smartOp(chip.dataset.op);
+    if (chip.dataset.ex != null) {
+      input.value = chip.dataset.ex;
+      input.focus();
+      livePreview();
+    }
+  });
+
+  input.addEventListener("input", livePreview);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); commit(); }
+  });
+  $("evalBtn").addEventListener("click", (e) => { ripple(e.currentTarget, e); commit(); });
+
+  /* history */
+  function renderHistory() {
+    const list = $("historyList");
+    if (!history.length) {
+      list.innerHTML = '<div class="hist-empty">Your calculations will appear here…</div>';
+      return;
+    }
+    list.innerHTML = "";
+    history.forEach((h, i) => {
+      const item = document.createElement("div");
+      item.className = "hist-item";
+      item.style.animationDelay = Math.min(i * 0.03, 0.3) + "s";
+      const l = document.createElement("div"); l.className = "h-l";
+      const r = document.createElement("div"); r.className = "h-r";
+      renderTex(l, h.input, false);
+      r.textContent = h.result;
+      item.append(l, r);
+      item.addEventListener("click", () => {
+        input.value = h.input;
+        livePreview();
+        input.focus();
+      });
+      list.appendChild(item);
+    });
+  }
+
+  /* seed a welcoming example */
+  input.value = "\\frac{\\sqrt{16}}{2} + \\pi";
+  livePreview();
+
+  /* ================================================================
+     GRAPH ENGINE (custom canvas plotter)
+     ================================================================ */
+  const canvas = $("plotCanvas"), ctx = canvas.getContext("2d");
+  const readout = $("plotReadout");
+  const PALETTE = ["#00e5ff", "#ff5c7c", "#3ddc97", "#ffc857", "#b388ff", "#ff9f68"];
+  let view = { cx: 0, cy: 0, scale: 55 };
+  let anim = null;
+  let showGrid = true;
+  let trace = null;
+  let analysis = null; // {fnIndex, roots, ext}
+  let functions = [ makeFn("\\sin(x)/x"), makeFn("x^3 - 3x") ];
+
+  function makeFn(latex) {
+    return { latex: latex || "", color: PALETTE[0], visible: true, err: null, f: null };
+  }
+
+  function compileAll() {
+    functions.forEach((fn, i) => {
+      fn.color = PALETTE[i % PALETTE.length];
+      fn.err = null; fn.f = null;
+      if (!fn.latex.trim()) return;
+      try {
+        let m = latexToMath(fn.latex);
+        m = m.replace(/^\s*y\s*=\s*/i, "");
+        const code = MATH.compile(m);
+        fn.f = (x) => {
+          try {
+            const v = code.evaluate({ x });
+            return typeof v === "number" ? v : NaN;
+          } catch (_) { return NaN; }
+        };
+      } catch (e) { fn.err = "✕"; }
+    });
+  }
+
+  /* device-pixel-ratio aware sizing */
+  function resizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function W() { return canvas.getBoundingClientRect().width; }
+  function H() { return canvas.getBoundingClientRect().height; }
+  const xToPx = (x) => W() / 2 + (x - view.cx) * view.scale;
+  const yToPx = (y) => H() / 2 - (y - view.cy) * view.scale;
+  const pxToX = (px) => view.cx + (px - W() / 2) / view.scale;
+  const pxToY = (py) => view.cy + (H() / 2 - py) / view.scale;
+
+  function css(varName) {
+    return getComputedStyle(document.body).getPropertyValue(varName).trim();
+  }
+
+  function draw() {
+    const w = W(), h = H();
+    ctx.clearRect(0, 0, w, h);
+
+    const step = niceStep(80 / view.scale);
+    const x0 = pxToX(0), x1 = pxToX(w), y0 = pxToY(h), y1 = pxToY(0);
+
+    /* ---- grid ---- */
+    if (showGrid) {
+      ctx.strokeStyle = css("--grid-line");
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let x = Math.ceil(x0 / step) * step; x <= x1; x += step) {
+        const px = Math.round(xToPx(x)) + 0.5;
+        ctx.moveTo(px, 0); ctx.lineTo(px, h);
+      }
+      for (let y = Math.ceil(y0 / step) * step; y <= y1; y += step) {
+        const py = Math.round(yToPx(y)) + 0.5;
+        ctx.moveTo(0, py); ctx.lineTo(w, py);
+      }
+      ctx.stroke();
+    }
+
+    /* ---- axes ---- */
+    ctx.strokeStyle = css("--grid-axis");
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    const ax = Math.round(xToPx(0)) + 0.5, ay = Math.round(yToPx(0)) + 0.5;
+    if (ax >= 0 && ax <= w) { ctx.moveTo(ax, 0); ctx.lineTo(ax, h); }
+    if (ay >= 0 && ay <= h) { ctx.moveTo(0, ay); ctx.lineTo(w, ay); }
+    ctx.stroke();
+
+    /* ---- tick labels ---- */
+    ctx.fillStyle = css("--txt-dim");
+    ctx.font = "11px 'Segoe UI', sans-serif";
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    const labelStep = step;
+    for (let x = Math.ceil(x0 / labelStep) * labelStep; x <= x1; x += labelStep) {
+      if (Math.abs(xToPx(x) - ax) < 12) continue;
+      const py = Math.min(Math.max(ay, 4), h - 18);
+      ctx.fillText(fmtTick(x, labelStep), xToPx(x), py + 3);
+    }
+    ctx.textAlign = "left"; ctx.textBaseline = "middle";
+    for (let y = Math.ceil(y0 / labelStep) * labelStep; y <= y1; y += labelStep) {
+      if (Math.abs(yToPx(y) - ay) < 12) continue;
+      const px = Math.min(Math.max(ax + 6, 4), w - 46);
+      ctx.fillText(fmtTick(y, labelStep), px, yToPx(y));
+    }
+
+    /* ---- curves ---- */
+    functions.forEach((fn) => {
+      if (!fn.visible || !fn.f) return;
+      ctx.strokeStyle = fn.color;
+      ctx.lineWidth = 2.4;
+      ctx.lineJoin = "round";
+      ctx.shadowColor = fn.color;
+      ctx.shadowBlur = 9;
+      ctx.beginPath();
+      let penDown = false, prevPy = null;
+      const jump = h * 3;
+      for (let px = 0; px <= w; px += 2) {
+        const x = pxToX(px);
+        const y = fn.f(x);
+        if (!isFinite(y)) { penDown = false; prevPy = null; continue; }
+        const py = yToPx(y);
+        if (py < -10 * h || py > 11 * h) { penDown = false; prevPy = null; continue; }
+        if (penDown && prevPy !== null && Math.abs(py - prevPy) > jump) penDown = false;
+        if (!penDown) { ctx.moveTo(px, py); penDown = true; }
+        else ctx.lineTo(px, py);
+        prevPy = py;
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    });
+
+    /* ---- analysis markers ---- */
+    if (analysis) {
+      const fn = functions[analysis.fnIndex];
+      if (fn && fn.f) {
+        ctx.fillStyle = "#ff5c7c";
+        analysis.roots.forEach((r) => {
+          ctx.beginPath(); ctx.arc(xToPx(r), yToPx(0), 5, 0, Math.PI * 2); ctx.fill();
+        });
+        ctx.fillStyle = "#3ddc97";
+        analysis.ext.forEach((m) => {
+          ctx.beginPath(); ctx.arc(xToPx(m.x), yToPx(m.y), 4.5, 0, Math.PI * 2); ctx.fill();
+        });
+      }
+    }
+
+    /* ---- trace crosshair ---- */
+    if (trace) {
+      ctx.strokeStyle = "rgba(255,255,255,0.25)";
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.moveTo(trace.px, 0); ctx.lineTo(trace.px, h);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      functions.forEach((fn) => {
+        if (!fn.visible || !fn.f) return;
+        const y = fn.f(trace.x);
+        if (!isFinite(y)) return;
+        const py = yToPx(y);
+        if (py < -20 || py > h + 20) return;
+        ctx.fillStyle = fn.color;
+        ctx.shadowColor = fn.color; ctx.shadowBlur = 12;
+        ctx.beginPath(); ctx.arc(trace.px, py, 5.5, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+    }
+    updateReadout();
+  }
+
+  function updateReadout() {
+    const w = W(), h = H();
+    let s = "x ∈ [" + round(pxToX(0)) + ", " + round(pxToX(w)) + "]<br>y ∈ [" +
+            round(pxToY(h)) + ", " + round(pxToY(0)) + "]";
+    if (trace) {
+      s += "<br><b>x = " + round(trace.x) + "</b>";
+      functions.forEach((fn) => {
+        if (!fn.visible || !fn.f) return;
+        const y = fn.f(trace.x);
+        if (isFinite(y)) s += '<br><span style="color:' + fn.color + '">●</span> ' + round(y);
+      });
+    }
+    readout.innerHTML = s;
+  }
+  const round = (v) => {
+    if (Math.abs(v) >= 1e6 || (Math.abs(v) < 1e-4 && v !== 0)) return v.toExponential(4);
+    return String(parseFloat(v.toFixed(4)));
+  };
+
+  /* ---------- pan / zoom / trace ---------- */
+  let drag = null;
+  canvas.addEventListener("pointerdown", (e) => {
+    canvas.setPointerCapture(e.pointerId);
+    drag = { px: e.offsetX, py: e.offsetY, cx: view.cx, cy: view.cy };
+  });
+  canvas.addEventListener("pointermove", (e) => {
+    if (drag) {
+      view.cx = drag.cx - (e.offsetX - drag.px) / view.scale;
+      view.cy = drag.cy + (e.offsetY - drag.py) / view.scale;
+      draw();
+    }
+    trace = { px: e.offsetX, x: pxToX(e.offsetX) };
+    draw();
+  });
+  canvas.addEventListener("pointerup", () => { drag = null; });
+  canvas.addEventListener("pointerleave", () => { trace = null; draw(); });
+
+  canvas.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const factor = Math.exp(-e.deltaY * 0.0013);
+    // keep the world point under the cursor fixed
+    const wx = pxToX(e.offsetX), wy = pxToY(e.offsetY);
+    view.scale = Math.min(Math.max(view.scale * factor, 1e-7), 1e7);
+    view.cx = wx - (e.offsetX - W() / 2) / view.scale;
+    view.cy = wy + (e.offsetY - H() / 2) / view.scale;
+    draw();
+  }, { passive: false });
+
+  /* pinch zoom */
+  const touches = new Map();
+  canvas.addEventListener("touchstart", (e) => {
+    for (const t of e.changedTouches) touches.set(t.identifier, t);
+  }, { passive: true });
+  canvas.addEventListener("touchmove", (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const [a, b] = e.touches;
+      const dNow = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+      const pa = touches.get(a.identifier), pb = touches.get(b.identifier);
+      if (pa && pb) {
+        const dPrev = Math.hypot(pa.clientX - pb.clientX, pa.clientY - pb.clientY) || dNow;
+        const rect = canvas.getBoundingClientRect();
+        const mx = (a.clientX + b.clientX) / 2 - rect.left;
+        const my = (a.clientY + b.clientY) / 2 - rect.top;
+        const wx = pxToX(mx), wy = pxToY(my);
+        view.scale = Math.min(Math.max(view.scale * (dNow / dPrev), 1e-7), 1e7);
+        view.cx = wx - (mx - W() / 2) / view.scale;
+        view.cy = wy + (my - H() / 2) / view.scale;
+        draw();
+      }
+      for (const t of e.changedTouches) touches.set(t.identifier, t);
+    }
+  }, { passive: false });
+
+  /* zoom buttons with smooth animation */
+  function animateTo(target, ms) {
+    const from = { ...view }, t0 = performance.now();
+    if (anim) cancelAnimationFrame(anim);
+    (function step(now) {
+      const k = Math.min((now - t0) / ms, 1);
+      const e = 1 - Math.pow(1 - k, 3);
+      view.cx = from.cx + (target.cx - from.cx) * e;
+      view.cy = from.cy + (target.cy - from.cy) * e;
+      view.scale = from.scale * Math.pow(target.scale / from.scale, e);
+      draw();
+      if (k < 1) anim = requestAnimationFrame(step);
+    })(t0);
+  }
+  $("zoomIn").addEventListener("click", () => animateTo({ ...view, scale: view.scale * 1.5 }, 260));
+  $("zoomOut").addEventListener("click", () => animateTo({ ...view, scale: view.scale / 1.5 }, 260));
+  $("resetView").addEventListener("click", () => animateTo({ cx: 0, cy: 0, scale: 55 }, 450));
+
+  $("toggleGrid").addEventListener("click", (e) => {
+    showGrid = !showGrid;
+    e.currentTarget.classList.toggle("on", showGrid);
+    draw();
+  });
+  $("toggleGrid").classList.add("on");
+
+  /* PNG export */
+  $("pngBtn").addEventListener("click", () => {
+    const a = document.createElement("a");
+    a.download = "omnicalc-graph.png";
+    a.href = canvas.toDataURL("image/png");
+    a.click();
+  });
+
+  /* roots & extrema */
+  $("analyzeBtn").addEventListener("click", (e) => {
+    const btn = e.currentTarget;
+    const idx = functions.findIndex((f) => f.f && f.visible);
+    if (idx < 0) return;
+    const vx0 = pxToX(0), vx1 = pxToX(W());
+    const pad = (vx1 - vx0) * 0.02;                    // sample slightly past the edges
+    const res = analyzeFunction(functions[idx].f, vx0 - pad, vx1 + pad);
+    analysis = { fnIndex: idx, roots: res.roots, ext: res.ext };
+    btn.classList.add("on");
+    const box = $("analysisBox");
+    box.hidden = false;
+    let html = "";
+    res.roots.filter((r) => r >= vx0 && r <= vx1).forEach((r) => {
+      html += '<div><span class="a-tag a-root">root</span> x = ' + round(r) + "</div>";
+    });
+    res.ext.filter((m) => m.x >= vx0 && m.x <= vx1).forEach((m) => {
+      html += '<div><span class="a-tag a-ext">' + m.type + "</span> (" + round(m.x) + ", " + round(m.y) + ")</div>";
+    });
+    if (!html) html = '<span style="color:var(--txt-dim)">No roots or extrema of f₁ found in this window.</span>';
+    else html = '<div style="color:var(--txt-dim);margin-bottom:4px">f₁ analysis:</div>' + html;
+    box.innerHTML = html;
+    draw();
+  });
+
+  /* ---------- function list UI ---------- */
+  function renderFnList() {
+    const list = $("fnList");
+    list.innerHTML = "";
+    functions.forEach((fn, i) => {
+      const item = document.createElement("div");
+      item.className = "fn-item" + (fn.visible ? "" : " hidden-fn") + (fn.err ? " err" : "");
+      item.style.animationDelay = Math.min(i * 0.04, 0.3) + "s";
+
+      const dot = document.createElement("span");
+      dot.className = "fn-dot";
+      dot.style.background = fn.color;
+      dot.style.color = fn.color;
+      dot.title = "show / hide";
+      dot.addEventListener("click", () => { fn.visible = !fn.visible; renderFnList(); draw(); });
+
+      const inp = document.createElement("input");
+      inp.value = fn.latex;
+      inp.spellcheck = false;
+      inp.placeholder = "f(x) = …";
+      inp.addEventListener("input", () => { fn.latex = inp.value; compileAll(); draw(); });
+
+      const del = document.createElement("button");
+      del.className = "fn-del"; del.textContent = "✕"; del.title = "remove";
+      del.addEventListener("click", () => {
+        functions.splice(i, 1);
+        if (!functions.length) functions.push(makeFn(""));
+        analysis = null;
+        renderFnList(); compileAll(); draw();
+      });
+
+      item.append(dot, inp, del);
+      list.appendChild(item);
+    });
+  }
+
+  $("addFnBtn").addEventListener("click", () => {
+    if (functions.length >= 6) return;
+    functions.push(makeFn(""));
+    renderFnList();
+    const inputs = $("fnList").querySelectorAll("input");
+    inputs[inputs.length - 1].focus();
+  });
+
+  document.querySelectorAll('.chip[data-fn]').forEach((c) => {
+    c.addEventListener("click", () => {
+      if (!functions[functions.length - 1].latex.trim()) {
+        functions[functions.length - 1].latex = c.dataset.fn;
+      } else if (functions.length < 6) {
+        functions.push(makeFn(c.dataset.fn));
+      } else return;
+      renderFnList(); compileAll(); draw();
+    });
+  });
+
+  /* ---------- theme ---------- */
+  $("themeBtn").addEventListener("click", () => {
+    document.body.classList.toggle("light");
+    $("themeBtn").textContent = document.body.classList.contains("light") ? "☀" : "☾";
+    draw();
+  });
+
+  /* ---------- init ---------- */
+  window.addEventListener("resize", () => { moveTabSlider(); resizeCanvas(); });
+  renderFnList();
+  compileAll();
+  requestAnimationFrame(() => { moveTabSlider(); resizeCanvas(); });
+}
+
+/* wait for deferred scripts */
+if (document.readyState === "complete") boot();
+else window.addEventListener("load", boot);
+})();
+</script>
+</body>
+</html>
