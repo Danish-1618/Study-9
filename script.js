@@ -4,16 +4,50 @@ if ('serviceWorker' in navigator) {
     .catch((err) => console.log("SW Registration Failed:", err));
 }
 
-// ... baaki tumhara search logic yahan niche rahega ...
-
-// 1. Elements select karo
 const searchBar = document.getElementById('searchInput');
 const videos = document.querySelectorAll('.video');
-const pdfs = document.querySelectorAll('.pdf'); // <-- PDF elements select kiye
+const pdfs = document.querySelectorAll('.pdf');
 const videoGallery = document.querySelector('.video-gallery');
 const pdfGallery = document.querySelector('.pdf-gallery');
 
-// 2. Results count dikhane ke liye ek NAYA div banao
+// Keep the homepage navigation usable on narrow screens and make every item a real link.
+const tabs = document.getElementById('tabs');
+if (tabs) {
+  const navLinks = {
+    home: 'index.html',
+    videotab: '#videos',
+    shorts: '#shorts',
+    'code-area': 'code-editor.html',
+    'ai-area': 'Neux_AI.html',
+    'myYT-channel': 'https://www.youtube.com/@Math_1.618'
+  };
+  Object.entries(navLinks).forEach(([id, href]) => {
+    const item = document.getElementById(id);
+    if (!item || item.querySelector('a')) return;
+    const link = document.createElement('a');
+    link.href = href;
+    link.textContent = item.textContent.trim();
+    if (href.startsWith('http')) {
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+    }
+    item.textContent = '';
+    item.appendChild(link);
+  });
+
+  // Add the calculator to the homepage without disturbing existing cards.
+  if (!document.getElementById('omni-calculator-card') && pdfGallery) {
+    const card = document.createElement('div');
+    card.id = 'omni-calculator-card';
+    card.className = 'pdf calculator-card';
+    card.dataset.title = 'omni calculator scientific calculator graph latex math';
+    card.innerHTML = '<h3 class="vid-title">OmniCalc | Scientific Calculator & Graphs</h3>' +
+      '<p>Calculate, graph functions, and render LaTeX beautifully.</p>' +
+      '<a class="calculator-link" href="omni-calculator.html">Open OmniCalc →</a>';
+    pdfGallery.appendChild(card);
+  }
+}
+
 const resultCount = document.createElement('div');
 resultCount.id = 'resultCount';
 resultCount.style.textAlign = 'center';
@@ -21,63 +55,29 @@ resultCount.style.padding = '15px';
 resultCount.style.fontSize = '18px';
 resultCount.style.fontWeight = 'bold';
 resultCount.style.color = '#064386';
+if (videoGallery && pdfGallery) videoGallery.parentNode.insertBefore(resultCount, pdfGallery);
 
-// Is count wale div ko Video gallery ke theek UPAR lagao
-videoGallery.parentNode.insertBefore(resultCount, pdfGallery);
+function updateResultCount(query, visibleCount) {
+  if (query === '') resultCount.innerHTML = `📚 Total resources: ${videos.length + pdfs.length}`;
+  else if (visibleCount === 0) resultCount.innerHTML = `<span style="color:red;">❌ No result found for "${query}"</span>`;
+  else resultCount.innerHTML = `<span style="color:green;">✅ ${visibleCount} result(s) found for "${query}"</span>`;
+}
 
-// Initially page load par total count dikhao
-resultCount.innerHTML = `📚 Total Videos: ${videos.length}`;
-
-// 3. Search Engine Logic (Event Listener)
-searchBar.addEventListener('keyup', function(event) {
-    let searchQuery = event.target.value.toLowerCase();
-    let visibleCount = 0; 
-    
-    // --- VIDEO SEARCH LOGIC ---
-    videos.forEach(function(video) {
-        let title = video.getAttribute('data-title').toLowerCase();
-        
-        if (title.includes(searchQuery)) {
-            video.style.display = ""; 
-            visibleCount++; 
-        } else {
-            video.style.display = "none"; 
-        }
-    });
-
-    // --- PDF SEARCH LOGIC (ADDED) ---
-    pdfs.forEach(function(pdf) {
-        let title = pdf.getAttribute('data-title').toLowerCase();
-        
-        if (title.includes(searchQuery)) {
-            pdf.style.display = ""; 
-            visibleCount++; 
-        } else {
-            pdf.style.display = "none"; 
-        }
-    });
-    
-    // Counter messages bina kisi badlav ke pehle jaisa hi hai
-    if (searchQuery === "") {
-        resultCount.innerHTML = `📚 Total Videos: ${videos.length}`;
-    } else if (visibleCount === 0) {
-        resultCount.innerHTML = `<span style="color: red;">❌ Not found result for "${searchQuery}"</span>`;
-    } else {
-        resultCount.innerHTML = `<span style="color: green;">✅ ${visibleCount} result(s) found for "${searchQuery}"</span>`;
-    }
+updateResultCount('', videos.length + pdfs.length);
+if (searchBar) searchBar.addEventListener('input', function(event) {
+  const searchQuery = event.target.value.toLowerCase().trim();
+  let visibleCount = 0;
+  [...videos, ...pdfs].forEach((item) => {
+    const title = (item.getAttribute('data-title') || '').toLowerCase();
+    const visible = title.includes(searchQuery);
+    item.style.display = visible ? '' : 'none';
+    if (visible) visibleCount++;
+  });
+  updateResultCount(searchQuery, visibleCount);
 });
 
-// ========================================= 
-// VIDEO PLAY FUNCTION (AUTO-PLAY FIXED)
-// ========================================= 
 function playVideo(frameDiv) {
-    let iframe = frameDiv.querySelector('.my-iframe');
-    
-    if (iframe && !iframe.getAttribute('src')) {
-        let videoUrl = iframe.getAttribute('data-src');
-        iframe.setAttribute('src', videoUrl);
-    }
-    
-    // Poster aur play button ko hide kar dega taaki video dikhe
-    frameDiv.classList.add('hide-poster');
+  const iframe = frameDiv.querySelector('.my-iframe');
+  if (iframe && !iframe.getAttribute('src')) iframe.setAttribute('src', iframe.getAttribute('data-src'));
+  frameDiv.classList.add('hide-poster');
 }
